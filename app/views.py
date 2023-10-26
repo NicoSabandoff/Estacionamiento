@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.generic import CreateView
 from .forms import DuenoSignUpForm, ClienteSignUpForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Arrendamiento, Estacionamiento, User
+from .models import Arrendamiento, Comuna, Estacionamiento, User
 import pytz
 from datetime import datetime
 from django.db.models import Q
@@ -63,7 +63,14 @@ def logout_view(request):
     return redirect('/')
 
 
+def lista_comunas(request):
+    comunas = Comuna.objects.all()
+    return render(request, 'app/buscar.html', {'comunas': comunas})
+
+
+
 def buscar(request):
+
     if request.method == 'POST':
         comuna = request.POST.get('comuna')
         fecha_inicio = request.POST.get('fecha_inicio')
@@ -81,8 +88,15 @@ def buscar(request):
 
         fecha_inicio_formulario = datetime.combine(fecha_inicio.date(), hora_inicio.time()).astimezone(tz)
 
+        print(fecha_inicio)
+        print(fecha_fin)
+        print(hora_inicio)
+        print(hora_fin)
+        print(fecha_inicio_formulario)
+
         # Obtén la fecha y hora actual con la misma zona horaria
         ahora = datetime.now(tz)
+        print("Ahora es:", ahora)
 
         # Inicializa la variable estacionamientos_disponibles
         estacionamientos_disponibles = []
@@ -99,10 +113,10 @@ def buscar(request):
             estacionamientos_disponibles = Estacionamiento.objects.exclude(
                 id__in=Arrendamiento.objects.filter(
                     Q(fecha_fin__gte=fecha_inicio, fecha_inicio__lte=fecha_fin) &
-                    Q(hora_fin__gte=hora_inicio, hora_inicio__lte=hora_fin)
+                    Q(Q(hora_fin__gte=hora_inicio, hora_inicio__lte=hora_fin) |
+                    Q(hora_inicio__gte=hora_inicio, hora_inicio__lte=hora_fin))
                 ).values('estacionamiento__id')
             ).filter(comuna__comuna=comuna)
-            
 
             for estacionamiento in estacionamientos_disponibles:
                 costo_por_hora=estacionamiento.costo_por_hora

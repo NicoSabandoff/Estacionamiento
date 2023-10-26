@@ -7,7 +7,7 @@ class User(AbstractUser):
     nombre = models.CharField(max_length=100)
     apellido= models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-    direccion = models.CharField(max_length=20)
+    rut = models.CharField(max_length=20)
 
 
 class Cliente(models.Model):
@@ -27,9 +27,23 @@ class Vehiculo(models.Model):
     marca = models.CharField(max_length=50)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
 
+class Tamano(models.Model):
+    TAMAÑO_CHOICES = (
+        ('pequeño', 'Pequeño'),
+        ('mediano', 'Mediano'),
+        ('grande', 'Grande'),
+    )
+
+    tamano = models.CharField(max_length=10, choices=TAMAÑO_CHOICES, unique=True)
+    descripcion = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.tamano
 
 class Estacionamiento(models.Model):
     direccion = models.CharField(max_length=200)
+    complemento = models.CharField(max_length=100, default='')
+    tamano = models.ForeignKey(Tamano, on_delete=models.CASCADE, default=1)
     dueno = models.ForeignKey(Dueno, on_delete=models.CASCADE)
     comuna = models.ForeignKey(Comuna, on_delete=models.CASCADE)
     costo_por_hora = models.IntegerField(default=0)

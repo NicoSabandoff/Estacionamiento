@@ -4,10 +4,11 @@ from django.db import transaction
 from .models import User,Dueno,Cliente
 
 class DuenoSignUpForm(UserCreationForm):
+    rut = forms.CharField(required=True)
     nombre = forms.CharField(required=True)
     apellido = forms.CharField(required=True)
     telefono = forms.CharField(required=True)
-    direccion = forms.CharField(required=True)
+
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -16,20 +17,22 @@ class DuenoSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_dueno = True
+        user.rut = self.cleaned_data.get('rut')    
         user.nombre = self.cleaned_data.get('nombre')
         user.apellido = self.cleaned_data.get('apellido')
+        user.telefono = self.cleaned_data.get('telefono')
         user.save()
         dueno = Dueno.objects.create(user=user)
-        dueno.telefono=self.cleaned_data.get('telefono')
-        dueno.direccion=self.cleaned_data.get('direccion')
+
         dueno.save()
         return user
 
 class ClienteSignUpForm(UserCreationForm):
+    rut = forms.CharField(required=True)    
     nombre = forms.CharField(required=True)
     apellido = forms.CharField(required=True)
     telefono = forms.CharField(required=True)
-    direccion = forms.CharField(required=True)
+
 
 
     class Meta(UserCreationForm.Meta):
@@ -39,11 +42,12 @@ class ClienteSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_cliente = True
+        user.rut = self.cleaned_data.get('rut')         
         user.nombre = self.cleaned_data.get('nombre')
         user.apellido = self.cleaned_data.get('apellido')
+        user.telefono = self.cleaned_data.get('telefono')
         user.save()
         cliente = Cliente.objects.create(user=user)
-        cliente.telefono=self.cleaned_data.get('telefono')
-        cliente.direccion=self.cleaned_data.get('direccion')
         cliente.save()
         return user
+    
