@@ -8,4 +8,6 @@ urlpatterns=[
      path('dueno_register/',views.dueno_register.as_view(), name='dueno_register'),
      path('login/',views.login_request, name='login'),
      path('logout/',views.logout_view, name='logout'),
+     path('buscar/', views.buscar, name='buscar'),
+
 ]

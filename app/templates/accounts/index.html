@@ -1,8 +1,58 @@
 <h1>Welcome</h1>
 
-{% if user.is_authenticated%}
-<a href="{% url 'logout' %}">Logout</a> <br>
-{% else %}
-<a href="{% url 'register' %}">Register</a> <br>
-<a href="{% url 'login' %}">Login</a> 
-{% endif %}
+
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" action="{% url 'buscar' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="comuna">Comuna</label>
+                    <input type="text" class="form-control" id="comuna" name="comuna" style="background-color: #E5E0EC;"
+                        required>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio:</label>
+                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                        style="background-color: #E5E0EC;" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="hora_Inicio">Hora de Inicio:</label>
+                <select class="form-control" id="hora_inicio" name="hora_inicio" style="background-color: #E5E0EC;"
+                    required>
+                    <option value="">--:--</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha de Fin:</label>
+                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin"
+                        style="background-color: #E5E0EC;" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="hora_fin">Hora de Fin:</label>
+                    <select class="form-control" id="hora_fin" name="hora_fin" style="background-color: #E5E0EC;"
+                        required>
+                        <option value="">--:--</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Buscar</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -17,11 +17,11 @@ class DuenoSignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.is_dueno = True
         user.nombre = self.cleaned_data.get('nombre')
-        user.last_name = self.cleaned_data.get('apellido')
+        user.apellido = self.cleaned_data.get('apellido')
         user.save()
         dueno = Dueno.objects.create(user=user)
-        dueno.phone_number=self.cleaned_data.get('telefono')
-        dueno.location=self.cleaned_data.get('direccion')
+        dueno.telefono=self.cleaned_data.get('telefono')
+        dueno.direccion=self.cleaned_data.get('direccion')
         dueno.save()
         return user
 
@@ -40,10 +40,10 @@ class ClienteSignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.is_cliente = True
         user.nombre = self.cleaned_data.get('nombre')
-        user.last_name = self.cleaned_data.get('apellido')
+        user.apellido = self.cleaned_data.get('apellido')
         user.save()
         cliente = Cliente.objects.create(user=user)
-        cliente.phone_number=self.cleaned_data.get('telefono')
-        cliente.location=self.cleaned_data.get('direccion')
+        cliente.telefono=self.cleaned_data.get('telefono')
+        cliente.direccion=self.cleaned_data.get('direccion')
         cliente.save()
         return user

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
+    'bootstrap4',
 
 ]
 
@@ -124,7 +125,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'app', 'static'),  # Directorio de la aplicación
+    os.path.join(BASE_DIR, 'app','static'),  # Directorio de la aplicación
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')  
 

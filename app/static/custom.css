@@ -1,0 +1,80 @@
+.navbar {
+    background-color: #4300BE;
+  }
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+  }
+  .navbar-brand img {
+    margin-right: 10px;
+  }
+  .navbar-nav .nav-link {
+    color: white;
+  }
+  
+  .form-control{
+    background-color:  #9C88B8;
+  
+  }
+  .label_registro{
+  
+    color: #9C88B8;
+  }
+  
+  .h2{
+    margin-top: 50px; 
+    color: #4300BE;
+  }
+  .btn{
+    background-color: #FFA011; 
+    color: #FFFFFF;
+  }
+  
+  #password,#email{
+    background-color: #E5E0EC;
+  }
+  
+  
+  .cuadro-costohora {
+    border: 2px solid purple; /* Borde morado */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 5px 10px; /* Espaciado interno */
+    color: purple; /* Texto morado */
+    background-color: transparent; /* Fondo transparente */
+    display: inline-block; /* Para que esté en línea con el botón Reservar */
+  }
+  
+  #footer {
+    background-image: url('app/javascript.js');
+    /* Puedes ajustar otras propiedades de fondo según tus necesidades */
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* Añade otras propiedades de estilo aquí */
+  }
+  
+  
+  /* Estilo para el campo "Rut" */
+  #rut-wrapper {
+    background-color: #E5E0EC; /* Color de fondo similar a otros campos */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 5px; /* Espaciado interno */
+  }
+  
+  /* Estilo para el botón "Valida RUT" */
+  #btnvalida {
+    background-color: #FFA011; /* Color de fondo similar a otros botones */
+    color: #FFFFFF; /* Color de texto en el botón */
+    border: none; /* Quita el borde del botón si es necesario */
+  }
+  
+  /* Estilo para el cuadro de texto "ej: 11111111" */
+  #txt_rut::placeholder {
+    font-size: 14px; /* Tamaño de fuente similar a otros campos */
+    color: #000; /* Color de texto similar a otros campos */
+    font-family: Arial, sans-serif; /* Tipografía similar a otros campos */
+  }
+  
+  
+  
+  
+  
