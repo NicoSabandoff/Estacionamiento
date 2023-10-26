@@ -8,6 +8,9 @@ urlpatterns=[
      path('dueno_register/',views.dueno_register.as_view(), name='dueno_register'),
      path('login/',views.login_request, name='login'),
      path('logout/',views.logout_view, name='logout'),
-     path('buscar/', views.buscar, name='buscar'),
+     path('buscar/',views.buscar, name='buscar'),
+     path('confirmar_reserva/<int:estacionamiento_id>/', views.confirmar_reserva, name='confirmar_reserva'),
+     path('pago_exitoso/', views.pago_exitoso, name='pago_exitoso'),
+     path('arriendos/', views.arriendos, name='arriendos'),
 
 ]
