@@ -39,15 +39,19 @@
                     </li>
 
                     <!-- Mostrar "Mis Arriendos" solo a los dueños -->
+                    {% if user.is_authenticated and user.cliente %}
                     <li class="nav-item">
-                        <a class="nav-link" href="">Mis Arriendos</a>
+                        <a class="nav-link" href="{% url 'arriendos' %}">Mis Arriendos</a>
                     </li>
+                {% endif %}
 
 
                     <!-- Mostrar "Mis Reservas" solo a los clientes -->
+                    {% if user.is_authenticated and user.dueno %}
                     <li class="nav-item">
-                        <a class="nav-link" href="">Mis Reservas</a>
+                        <a class="nav-link" href="{% url 'arriendos' %}">Mis Estacionamientos</a>
                     </li>
+                {% endif %}
 
                     <li class="nav-item">
                         <a class="nav-link" href="#">Ayuda</a>

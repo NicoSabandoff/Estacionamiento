@@ -1,0 +1,21 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+    <h1>Estacionamientos Arrendados</h1>
+    <div class="card-deck">
+        {% for arrendamiento in arrendamientos %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Fecha de Inicio: {{ arrendamiento.fecha_inicio }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Fecha de Fin: {{ arrendamiento.fecha_fin }}</h6>
+                    <p class="card-text">Precio Total: {{ arrendamiento.precio }}</p>
+                    <!-- Agrega más detalles según tus modelos -->
+                    <div class="btn-group" role="group">
+                        <a href="" class="btn btn-primary">Modificar</a>
+                        <a href="" class="btn btn-danger">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

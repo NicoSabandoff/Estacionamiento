@@ -192,3 +192,14 @@ def confirmar_reserva(request, estacionamiento_id):
 def pago_exitoso(request):
     # Lógica para la página de pago exitoso
     return render(request, 'estacionamiento/pago_exitoso.html')    
+
+
+
+def arriendos(request):
+    if request.user.is_authenticated:
+        cliente = Cliente.objects.get(user=request.user)
+        arrendamientos = Arrendamiento.objects.filter(cliente=cliente)
+    else:
+        arrendamientos = []
+
+    return render(request, 'estacionamiento/arriendos.html', {'arrendamientos': arrendamientos})
