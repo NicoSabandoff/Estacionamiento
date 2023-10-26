@@ -55,8 +55,8 @@ class Arrendamiento(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     precio = models.IntegerField()
-    hora_inicio = models.TimeField(default="00:00")
-    hora_fin = models.TimeField(default="00:00")
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
 
 class Reporte(models.Model):
     estacionamiento = models.ForeignKey(Estacionamiento, on_delete=models.CASCADE)
