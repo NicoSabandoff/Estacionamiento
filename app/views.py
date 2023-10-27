@@ -187,7 +187,7 @@ def editar_arrendamiento(request, arrendamiento_id):
     arrendamiento = get_object_or_404(Arrendamiento, pk=arrendamiento_id)
     
     if request.method == 'POST':
-        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_inicio = request.POST.get('fecha')
         hora_inicio = request.POST.get('hora_inicio')
         fecha_fin = request.POST.get('fecha_fin')
         hora_fin = request.POST.get('hora_fin')
@@ -204,3 +204,24 @@ def editar_arrendamiento(request, arrendamiento_id):
         return redirect('arriendos')
     
     return render(request, 'estacionamiento/editar_arrendamiento.html', {'arrendamiento': arrendamiento})
+
+
+def confirmar_cancelacion(request):
+    return render(request, 'estacionamiento/confirmacion_cancelado.html')
+
+def cancelar_reserva(request, arrendamiento_id):
+    try:
+        # Obtén el objeto de arrendamiento a cancelar
+        arrendamiento = Arrendamiento.objects.get(id=arrendamiento_id)
+        
+        # Realiza la lógica para cancelar la reserva aquí (por ejemplo, cambiar el estado de la reserva)
+        # ...
+
+        # Elimina el arrendamiento
+        arrendamiento.delete()
+
+        # Redirige a la página de confirmación de cancelación
+        return redirect('confirmar_cancelacion')
+    except Arrendamiento.DoesNotExist:
+        # Maneja el caso en el que el arrendamiento no existe
+        return redirect('error')

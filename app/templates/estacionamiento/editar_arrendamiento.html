@@ -9,8 +9,8 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="fecha_inicio">Fecha de Inicio:</label>
-                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                    <label for="fecha">Fecha de Inicio:</label>
+                    <input type="date" class="form-control" id="fecha" name="fecha"
                         style="background-color: #E5E0EC;" required>
                 </div>
             </div>
@@ -41,6 +41,46 @@
                 </div>
             </div>
         </div>
+        
         <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Confirmar</button>
     </form>
+
+
+    <script>
+        $(document).ready(function () {
+            // Copia la fecha del primer formulario al segundo formulario
+            var fechaCopia = $('#fecha').val();
+            $('#fecha_inicio').val(fechaCopia);
+            $('#fecha_fin').val(fechaCopia);
+            
+            // Resto del código...
+            
+            $('.comuna-option').click(function () {
+                var selectedComuna = $(this).text();
+                $('#comuna').text(selectedComuna);
+                $('#comuna_seleccionada').val(selectedComuna); // Actualiza el campo oculto
+            });
+    
+            // Obtén la fecha actual
+            var fechaActual = new Date();
+            var dd = fechaActual.getDate();
+            var mm = fechaActual.getMonth() + 1; // Los meses en JavaScript son 0-based
+            var yyyy = fechaActual.getFullYear();
+    
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+    
+            var fechaMinima = yyyy + '-' + mm + '-' + dd;
+    
+            // Establece la fecha mínima en los campos de fecha
+            $('#fecha_inicio').attr('min', fechaMinima);
+            $('#fecha_fin').attr('min', fechaMinima);
+        });
+    </script>
+    
+    
 {% endblock %}

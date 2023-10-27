@@ -9,13 +9,13 @@
                     <h6 class="card-subtitle mb-2 text-muted">Fecha de Inicio: {{ arrendamiento.fecha_inicio }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Fecha de Fin: {{ arrendamiento.fecha_fin }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Dirección: {{ arrendamiento.estacionamiento.direccion }}</h6>
-                    <h6 class="card-subtitle mb-2 text-muted">Precio Total: {{ arrendamiento.precio }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Costo por Hora: {{ arrendamiento.precio }}</h6>
                     <!-- Agrega más detalles según tus modelos -->
                     <div class="btn-group" role="group">
                         <a href="{% url 'editar_arrendamiento' arrendamiento.id %}" class="btn">Modificar</a>
                     </div>
                     <div class="btn-group" role="group">
-                        <a href="" class="btn">Cancelar Reserva</a>
+                        <a href="{% url 'cancelar_reserva' arrendamiento.id %}" class="btn">Cancelar Reserva</a>
                     </div>
                 </div>
             </div>
