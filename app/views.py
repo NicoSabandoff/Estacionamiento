@@ -7,7 +7,7 @@ from .forms import DuenoSignUpForm, ClienteSignUpForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Q
 
 def index(request):
@@ -60,32 +60,55 @@ def lista_comunas(request):
     comunas = Comuna.objects.all()
     return render(request, 'app/buscar.html', {'comunas': comunas})
 
+
+
+
+
+
+
+
 def buscar(request):
-    
-    comunas = Comuna.objects.all()  # Define comunas al principio de la función
+    comunas = Comuna.objects.all()
 
     if request.method == 'POST':
-        fecha_inicio = request.POST.get('fecha_inicio')
-        hora_inicio = request.POST.get('hora_inicio')
-        fecha_fin = request.POST.get('fecha_fin')
-        hora_fin = request.POST.get('hora_fin')
-        comuna_seleccionada = request.POST.get('comuna_seleccionada')
-        
-        estacionamientos_disponibles = Estacionamiento.objects.all() 
-        horas_totales = None 
-        costo_por_hora = None 
-        
+        fecha_inicio = datetime.strptime(request.POST.get('fecha_inicio'), '%Y-%m-%d')
+        hora_inicio = datetime.strptime(request.POST.get('hora_inicio'), '%H:%M')
+        fecha_fin = datetime.strptime(request.POST.get('fecha_fin'), '%Y-%m-%d')
+        hora_fin = datetime.strptime(request.POST.get('hora_fin'), '%H:%M')
+        comuna_nombre = request.POST.get('comuna_seleccionada')  # Nombre de la comuna
+
+        estacionamientos_disponibles = Estacionamiento.objects.all()
+
+        # Calcula la diferencia de tiempo en horas
+        tiempo_estacionamiento = (fecha_fin - fecha_inicio).total_seconds() / 3600 + \
+                                 (hora_fin - hora_inicio).total_seconds() / 3600
+
+        # Encuentra la comuna por su nombre
+        comuna = Comuna.objects.get(comuna=comuna_nombre)
+
+        # Obtiene el costo por hora de la comuna seleccionada
+        costo_por_hora = comuna.estacionamiento_set.first().costo_por_hora  # Asume una relación entre Comuna y Estacionamiento
+
+        # Calcula el costo total
+        costo_total = tiempo_estacionamiento * costo_por_hora
 
         return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
             'estacionamientos_disponibles': estacionamientos_disponibles,
-            'horas_totales': horas_totales,
+            'horas_totales': tiempo_estacionamiento,
             'costo_por_hora': costo_por_hora,
+            'costo_total': costo_total,  # Pasa el costo total a la plantilla
             'comunas': comunas,
         })
 
     return render(request, 'estacionamiento/buscar.html', {'comunas': comunas})
 
-# El resto de tu código (confirmar_reserva, pago_exitoso, arriendos, etc.) permanece igual.
+
+
+
+
+
+
+
 
 
 def confirmar_reserva(request, estacionamiento_id):
