@@ -1,21 +1,24 @@
-<h1>Welcome</h1>
-
-
 {% extends 'estacionamiento/base.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <form method="post" action="{% url 'buscar' %}">
         {% csrf_token %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label for="comuna">Comuna</label>
-                    <input type="text" class="form-control" id="comuna" name="comuna" style="background-color: #E5E0EC;"
-                        required>
-                </div>
-            </div>
+        
+        <div class="btn-group">
+            <button type="button" id="comuna" class="btn custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Comuna
+            </button>
+            <ul class="dropdown-menu">
+                {% for comuna in comunas %}
+                    <li><a class="dropdown-item comuna-option" href="#">{{ comuna.comuna }}</a></li>
+                {% endfor %}
+            </ul>
         </div>
+        <input type="hidden" id="comuna_seleccionada" name="comuna_seleccionada" value="">
+
+
+
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -51,8 +54,24 @@
                 </div>
             </div>
         </div>
-        <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Buscar</button>
+
+
+
+
+ <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Buscar</button>
+ 
     </form>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('.comuna-option').click(function () {
+            var selectedComuna = $(this).text();
+            $('#comuna').text(selectedComuna);
+            $('#comuna_seleccionada').val(selectedComuna); // Actualiza el campo oculto
+        });
+    });
+</script>
+
 
 {% endblock %}

@@ -75,6 +75,11 @@
   }
   
   
-  
+  .custom-btn {
+    background-color: #9C88B8;
+    color: white; /* Cambia el color del texto para que sea visible en el fondo */
+    border: none; /* Elimina el borde si es necesario */
+}
+
   
   
