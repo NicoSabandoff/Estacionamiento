@@ -69,7 +69,9 @@ def buscar(request):
         fecha_fin = request.POST.get('fecha_fin')
         hora_fin = request.POST.get('hora_fin')
 
-        # Resto de tu código...
+        estacionamientos_disponibles = None  
+        horas_totales = None 
+        costo_por_hora = None 
 
         # Pasa la variable 'comunas' al contexto
         return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
@@ -107,9 +109,6 @@ def confirmar_reserva(request, estacionamiento_id):
         hora_inicio = tz.localize(datetime.strptime(hora_inicio, '%Y-%m-%d %H:%M:%S'))
         fecha_fin = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d %H:%M:%S'))
         hora_fin = tz.localize(datetime.strptime(hora_fin, '%Y-%m-%d %H:%M:%S'))
-
-
-
 
 
         print("Datos recuperados de la sesión:")

@@ -1,41 +1,31 @@
 {% extends 'estacionamiento/base.html' %}
+{% load static %}
 
 {% block content %}
-
-<body>
-
-    <section>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 mx-auto">
-                    <div class="card">
-                        <div class="card-header text-black">
-                            <h2>Register</h2>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card" style="margin-top: 50px;">
+                <div class="card-header text-white" style="background-color: #4300BE; text-align: center;">
+                    <h2 style="color: white;">Register</h2>
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'cliente_register' %}" method="POST" novalidate>
+                        {% csrf_token %}
+                        {% for field in form.visible_fields %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% for error in field.errors %}
+                            <span style="color:red">{{ error }}</span>
+                            {% endfor %}
                         </div>
-                        <div class="card-body">
-                            <form action="{% url 'cliente_register' %}" method="POST" novalidate>
-                                {% csrf_token %}
-                                {% for field in form.visible_fields %}
-                                <div class="form-group">
-                                    {{ field.label_tag }}
-                                    {{ field }}
-                                    {% for error in field.errors %}
-                                    <span style="color:red">{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                                {% endfor %}
-
-                                <input type="submit" value="Register" class="btn btn-block btn-primary">
-                        </div>
-                        </form>
-                    </div>
+                        {% endfor %}
+                        <input type="submit" value="Register" class="btn btn-block" style="background-color: #FFA011;">
+                    </form>
                 </div>
             </div>
         </div>
-        </div>
-        </div>
-    </section>
-
-</body>
-
+    </div>
+</div>
 {% endblock %}
