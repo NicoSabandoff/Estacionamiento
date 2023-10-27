@@ -15,7 +15,7 @@
                 {% endfor %}
             </ul>
         </div>
-
+        <input type="hidden" id="comuna_seleccionada" name="comuna_seleccionada" value="">
 
 
 
@@ -63,14 +63,15 @@
     </form>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         $('.comuna-option').click(function () {
             var selectedComuna = $(this).text();
             $('#comuna').text(selectedComuna);
+            $('#comuna_seleccionada').val(selectedComuna); // Actualiza el campo oculto
         });
     });
 </script>
+
 
 {% endblock %}

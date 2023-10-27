@@ -68,20 +68,20 @@ def buscar(request):
         hora_inicio = request.POST.get('hora_inicio')
         fecha_fin = request.POST.get('fecha_fin')
         hora_fin = request.POST.get('hora_fin')
-
-        estacionamientos_disponibles = None  
+        comuna_seleccionada = request.POST.get('comuna_seleccionada')
+        
+        estacionamientos_disponibles = Estacionamiento.objects.all() 
         horas_totales = None 
         costo_por_hora = None 
+        
 
-        # Pasa la variable 'comunas' al contexto
         return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
             'estacionamientos_disponibles': estacionamientos_disponibles,
             'horas_totales': horas_totales,
             'costo_por_hora': costo_por_hora,
-            'comunas': comunas,  # Incluye 'comunas' en el contexto
+            'comunas': comunas,
         })
 
-    # En caso de una solicitud GET, renderiza el formulario con 'comunas'
     return render(request, 'estacionamiento/buscar.html', {'comunas': comunas})
 
 # El resto de tu código (confirmar_reserva, pago_exitoso, arriendos, etc.) permanece igual.
