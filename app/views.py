@@ -9,6 +9,7 @@ from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente
 import pytz
 from datetime import datetime
 from django.db.models import Q
+from datetime import datetime
 
 def index(request):
     return render(request, 'accounts/index.html')
@@ -61,6 +62,7 @@ def lista_comunas(request):
     return render(request, 'app/buscar.html', {'comunas': comunas})
 
 def buscar(request):
+    
     comunas = Comuna.objects.all()  # Define comunas al principio de la función
 
     if request.method == 'POST':
@@ -70,11 +72,48 @@ def buscar(request):
         hora_fin = request.POST.get('hora_fin')
         comuna_seleccionada = request.POST.get('comuna_seleccionada')
         
-        estacionamientos_disponibles = Estacionamiento.objects.all() 
-        horas_totales = None 
-        costo_por_hora = None 
+        tz = pytz.timezone('America/Santiago')
+
+        fecha_inicio = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        hora_inicio = tz.localize(datetime.strptime(hora_inicio, '%H:%M'))
+        fecha_fin = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        hora_fin = tz.localize(datetime.strptime(hora_fin, '%H:%M'))
+        
+       
+       
+        fecha_inicio_formulario = datetime.combine(fecha_inicio.date(), hora_inicio.time()).astimezone(tz)
+        
+        ahora = datetime.now(tz)
+        print("Ahora es:", ahora)
+
+        # Inicializa la variable estacionamientos_disponibles
+        estacionamientos_disponibles = []
+
+        tiempo_transcurrido = fecha_fin - fecha_inicio + (hora_fin - hora_inicio)
+        # Calcula las horas totales
+        horas_totales = tiempo_transcurrido.total_seconds() / 3600
+
+        costo_por_hora = 0
         
 
+        # Filtra estacionamientos disponibles
+        if ahora <= fecha_inicio_formulario:
+            estacionamientos_disponibles = Estacionamiento.objects.exclude(
+                id__in=Arrendamiento.objects.filter(
+                    Q(fecha_fin_gte=fecha_inicio, fecha_inicio_lte=fecha_fin) &
+                    Q(Q(hora_fin_gte=hora_inicio, hora_inicio_lte=hora_fin) |
+                    Q(hora_inicio_gte=hora_inicio, hora_inicio_lte=hora_fin))
+                ).values('estacionamiento__id')
+            )
+
+
+            for estacionamiento in estacionamientos_disponibles:
+                costo_por_hora=estacionamiento.costo_por_hora
+                print(horas_totales)
+                print(costo_por_hora)
+                estacionamiento.precio_total = costo_por_hora * horas_totales  # Calcula el precio total para este estacionamiento
+
+        # Pasa los valores calculados al contexto
         return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
             'estacionamientos_disponibles': estacionamientos_disponibles,
             'horas_totales': horas_totales,
@@ -138,6 +177,7 @@ def confirmar_reserva(request, estacionamiento_id):
     else:
         # User is not logged in
         return redirect('login')
+    
     
 def pago_exitoso(request):
     # Lógica para la página de pago exitoso
