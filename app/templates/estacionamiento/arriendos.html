@@ -6,7 +6,7 @@
         {% for arrendamiento in arrendamientos %}
             <div class="card">
                 <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Fecha de Inicio: {{ arrendamiento.fecha_inicio }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Fecha de Inicio: {{ arrendamiento.fecha }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Fecha de Fin: {{ arrendamiento.fecha_fin }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Dirección: {{ arrendamiento.estacionamiento.direccion }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Costo por Hora: {{ arrendamiento.precio }}</h6>
