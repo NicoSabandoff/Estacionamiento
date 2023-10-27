@@ -1,0 +1,46 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+    <h1>Editar Arrendamiento</h1>
+    <form method="post" action="{% url 'editar_arrendamiento' arrendamiento.id %}">
+
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio:</label>
+                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio"
+                        style="background-color: #E5E0EC;" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label for="hora_Inicio">Hora de Inicio:</label>
+                <select class="form-control" id="hora_inicio" name="hora_inicio" style="background-color: #E5E0EC;"
+                    required>
+                    <option value="">--:--</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha de Fin:</label>
+                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin"
+                        style="background-color: #E5E0EC;" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="hora_fin">Hora de Fin:</label>
+                    <select class="form-control" id="hora_fin" name="hora_fin" style="background-color: #E5E0EC;"
+                        required>
+                        <option value="">--:--</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Confirmar</button>
+    </form>
+{% endblock %}

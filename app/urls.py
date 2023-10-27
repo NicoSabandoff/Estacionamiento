@@ -12,5 +12,6 @@ urlpatterns=[
      path('confirmar_reserva/<int:estacionamiento_id>/', views.confirmar_reserva, name='confirmar_reserva'),
      path('pago_exitoso/', views.pago_exitoso, name='pago_exitoso'),
      path('arriendos/', views.arriendos, name='arriendos'),
+     path('editar_arrendamiento/<int:arrendamiento_id>/', views.editar_arrendamiento, name='editar_arrendamiento'),
 
 ]

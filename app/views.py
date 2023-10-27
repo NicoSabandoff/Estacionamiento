@@ -1,6 +1,6 @@
 import datetime
 from django.contrib.auth import login, logout, authenticate
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.views.generic import CreateView
 from .forms import DuenoSignUpForm, ClienteSignUpForm
@@ -180,3 +180,27 @@ def arriendos(request):
         arrendamientos = []
 
     return render(request, 'estacionamiento/arriendos.html', {'arrendamientos': arrendamientos})
+
+
+
+def editar_arrendamiento(request, arrendamiento_id):
+    arrendamiento = get_object_or_404(Arrendamiento, pk=arrendamiento_id)
+    
+    if request.method == 'POST':
+        fecha_inicio = request.POST.get('fecha_inicio')
+        hora_inicio = request.POST.get('hora_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        hora_fin = request.POST.get('hora_fin')
+
+        # Validación de datos (debes agregar validación según tus necesidades)
+
+        # Actualiza los datos del arrendamiento con los datos del formulario
+        arrendamiento.fecha_inicio = fecha_inicio
+        arrendamiento.hora_inicio = hora_inicio
+        arrendamiento.fecha_fin = fecha_fin
+        arrendamiento.hora_fin = hora_fin
+        arrendamiento.save()
+
+        return redirect('arriendos')
+    
+    return render(request, 'estacionamiento/editar_arrendamiento.html', {'arrendamiento': arrendamiento})

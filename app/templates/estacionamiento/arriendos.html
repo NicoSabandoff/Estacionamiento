@@ -1,21 +1,27 @@
-{% extends 'estacionamiento/base.html' %}
+{%extends 'estacionamiento/base.html' %}
 
 {% block content %}
-    <h1>Estacionamientos Arrendados</h1>
+    <h1>Reservas</h1>
     <div class="card-deck">
         {% for arrendamiento in arrendamientos %}
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Fecha de Inicio: {{ arrendamiento.fecha_inicio }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Fecha de Inicio: {{ arrendamiento.fecha_inicio }}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Fecha de Fin: {{ arrendamiento.fecha_fin }}</h6>
-                    <p class="card-text">Precio Total: {{ arrendamiento.precio }}</p>
+                    <h6 class="card-subtitle mb-2 text-muted">Dirección: {{ arrendamiento.estacionamiento.direccion }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Precio Total: {{ arrendamiento.precio }}</h6>
                     <!-- Agrega más detalles según tus modelos -->
                     <div class="btn-group" role="group">
-                        <a href="" class="btn btn-primary">Modificar</a>
-                        <a href="" class="btn btn-danger">Cancelar</a>
+                        <a href="{% url 'editar_arrendamiento' arrendamiento.id %}" class="btn">Modificar</a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="" class="btn">Cancelar Reserva</a>
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
 {% endblock %}
+
+
+ 
