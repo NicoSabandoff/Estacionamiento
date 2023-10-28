@@ -76,8 +76,14 @@
                 $('#hora_fin option').each(function () {
                     if ($(this).val() < horaInicio) {
                         $(this).prop('disabled', true);
+                    } else if ($(this).val() === horaInicio) {
+                        $(this).prop('disabled', true);
                     }
                 });
+            }
+
+            if (horaInicio != $(this).val()) {
+                $('#hora_fin').val('--.--');
             }
 
             $('#hora_fin').prop('disabled', false);
