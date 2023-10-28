@@ -14,5 +14,8 @@ urlpatterns=[
      path('editar_arrendamiento/<int:arrendamiento_id>/', views.editar_arrendamiento, name='editar_arrendamiento'),
      path('confirmar_cancelacion/', views.confirmar_cancelacion, name='confirmar_cancelacion'),
      path('cancelar_reserva/<int:arrendamiento_id>/', views.cancelar_reserva, name='cancelar_reserva'),
+     path('error/', views.error, name='error')
+
+     
      
 ]

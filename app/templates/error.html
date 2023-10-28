@@ -1,0 +1,114 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <form method="post" action="{% url 'buscar' %}">
+      {% csrf_token %}
+      
+      <div class="btn-group">
+          <button type="button" id="comuna" class="btn custom-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Comuna
+          </button>
+          <ul class="dropdown-menu">
+              {% for comuna in comunas %}
+                  <li><a class="dropdown-item comuna-option" href="#">{{ comuna.comuna }}</a></li>
+              {% endfor %}
+          </ul>
+      </div>
+      <input type="hidden" id="comuna_seleccionada" name="comuna_seleccionada" value="">
+      
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label for="fecha_inicio">Fecha de Inicio:</label>
+                  <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" style="background-color: #E5E0EC;" required>
+              </div>
+          </div>
+          <div class="col-md-6">
+              <label for="hora_inicio">Hora de Inicio:</label>
+              <select class="form-control" id="hora_inicio" name="hora_inicio" style="background-color: #E5E0EC;" required>
+                  <option value="">--:--</option>
+              </select>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label for="fecha_fin">Fecha de Fin:</label>
+                  <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" style="background-color: #E5E0EC;" required disabled>
+              </div>
+          </div>
+          <div class="col-md-6">
+              <div class="form-group">
+                  <label for="hora_fin">Hora de Fin:</label>
+                  <select class="form-control" id="hora_fin" name="hora_fin" style="background-color: #E5E0EC;" required disabled>
+                      <option value="">--:--</option>
+                  </select>
+              </div>
+          </div>
+      </div>
+      <button type="submit" class="btn transition" style="margin-top: 20px; float: right;">Buscar</button>
+  </form>
+</div>
+
+
+
+<script>
+  $(document).ready(function () {
+      $('.comuna-option').click(function () {
+          var selectedComuna = $(this).text();
+          $('#comuna').text(selectedComuna);
+          $('#comuna_seleccionada').val(selectedComuna);
+      });
+      
+      $('#fecha_inicio').on('change', function () {
+          var fechaInicio = $('#fecha_inicio').val();
+          $('#fecha_fin').attr('min', fechaInicio);
+          $('#fecha_fin').prop('disabled', false);
+      });
+
+      $('#hora_inicio').on('change', function () {
+          var horaInicio = $('#hora_inicio').val();
+          $('#hora_fin option').prop('disabled', false);
+
+          if ($('#fecha_inicio').val() === $('#fecha_fin').val()) {
+              $('#hora_fin option').each(function () {
+                  if ($(this).val() < horaInicio) {
+                      $(this).prop('disabled', true);
+                  }
+              });
+          }
+
+          $('#hora_fin').prop('disabled', false);
+      });
+      
+      // Resto de tu script existente
+      $(document).ready(function () {
+          $('.comuna-option').click(function () {
+              var selectedComuna = $(this).text();
+              $('#comuna').text(selectedComuna);
+              $('#comuna_seleccionada').val(selectedComuna);
+          });
+  
+          // Obtén la fecha actual
+          var fechaActual = new Date();
+          var dd = fechaActual.getDate();
+          var mm = fechaActual.getMonth() + 1; // Los meses en JavaScript son 0-based
+          var yyyy = fechaActual.getFullYear();
+  
+          if (dd < 10) {
+              dd = '0' + dd;
+          }
+          if (mm < 10) {
+              mm = '0' + mm;
+          }
+  
+          var fechaMinima = yyyy + '-' + mm + '-' + dd;
+  
+          // Establece la fecha mínima en los campos de fecha
+          $('#fecha_inicio').attr('min', fechaMinima);
+          $('#fecha_fin').attr('min', fechaMinima);
+      });
+  });
+</script>
+{% endblock %}

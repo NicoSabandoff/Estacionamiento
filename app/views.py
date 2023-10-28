@@ -162,3 +162,6 @@ def cancelar_reserva(request, arrendamiento_id):
     except Arrendamiento.DoesNotExist:
         # Maneja el caso en el que el arrendamiento no existe
         return redirect('error')
+    
+def error(request):
+    return render(request, 'error.html')
