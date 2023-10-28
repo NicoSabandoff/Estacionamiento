@@ -143,8 +143,12 @@ def editar_arrendamiento(request, arrendamiento_id):
     return render(request, 'estacionamiento/editar_arrendamiento.html', {'arrendamiento': arrendamiento})
 
 
+
+
 def confirmar_cancelacion(request):
     return render(request, 'estacionamiento/confirmacion_cancelado.html')
+
+
 
 def cancelar_reserva(request, arrendamiento_id):
     try:
