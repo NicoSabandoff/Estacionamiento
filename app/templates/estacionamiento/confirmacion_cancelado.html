@@ -1,0 +1,14 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card d-flex align-items-center">
+        <div class="card-body">
+            <h1>Reserva Cancelada</h1>
+            <p>Tu reserva ha sido cancelada con éxito.</p>
+            <p>Gracias por usar nuestro servicio.</p>
+            <a href="{% url 'arriendos' %}" class="btn">Volver a Mis Reservas</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
