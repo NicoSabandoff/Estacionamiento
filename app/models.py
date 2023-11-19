@@ -47,12 +47,23 @@ class Estacionamiento(models.Model):
     dueno = models.ForeignKey(Dueno, on_delete=models.CASCADE)
     comuna = models.ForeignKey(Comuna, on_delete=models.CASCADE)
     costo_por_hora = models.IntegerField(default=0)
+    habilitado = models.BooleanField(default=True)  # Nuevo campo para habilitar/deshabilitar
+
+    # Otros campos y métodos de tu modelo
+
+    def deshabilitar(self):
+        self.habilitado = False
+        self.save()
+
+    def habilitar(self):
+        self.habilitado = True
+        self.save()
 
 
 class Arrendamiento(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     estacionamiento = models.ForeignKey(Estacionamiento, on_delete=models.CASCADE)
-    fecha_inicio = models.DateField()
+    fecha = models.DateField()
     fecha_fin = models.DateField()
     precio = models.IntegerField()
     hora_inicio = models.TimeField()

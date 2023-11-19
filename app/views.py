@@ -1,16 +1,14 @@
 import datetime
-from django.contrib.auth import login, logout,authenticate
-from django.shortcuts import redirect, render
+from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.views.generic import CreateView
 from .forms import DuenoSignUpForm, ClienteSignUpForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Arrendamiento, Comuna, Estacionamiento, User,Cliente
+from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db.models import Q
-
-
 
 def index(request):
     return render(request, 'accounts/index.html')
@@ -38,30 +36,25 @@ class cliente_register(CreateView):
         login(self.request, user)
         return redirect('/')
 
-
 def login_request(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            print("entro")
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            print(username)
-            if user is not None :
-                login(request,user)
+            if user is not None:
+                login(request, user)
                 return redirect('/')
             else:
-                messages.error(request,"Usuario o contraseña invalida")
+                messages.error(request, "Usuario o contraseña inválida")
         else:
-                messages.error(request,"Usuario o contraseña invalida")
-    return render(request, 'accounts/login.html',
-    context={'form':AuthenticationForm()})
+            messages.error(request, "Usuario o contraseña inválida")
+    return render(request, 'accounts/login.html', context={'form': AuthenticationForm()})
 
 def logout_view(request):
     logout(request)
     return redirect('/')
-
 
 def lista_comunas(request):
     comunas = Comuna.objects.all()
@@ -69,125 +62,46 @@ def lista_comunas(request):
 
 
 
+
+
+
 def buscar(request):
+    comunas = Comuna.objects.all()
 
     if request.method == 'POST':
-        comuna = request.POST.get('comuna')
-        fecha_inicio = request.POST.get('fecha_inicio')
-        hora_inicio = request.POST.get('hora_inicio')
-        fecha_fin = request.POST.get('fecha_fin')
-        hora_fin = request.POST.get('hora_fin')
+        fecha_inicio = datetime.strptime(request.POST.get('fecha_inicio'), '%Y-%m-%d')
+        hora_inicio = datetime.strptime(request.POST.get('hora_inicio'), '%H:%M')
+        fecha_fin = datetime.strptime(request.POST.get('fecha_fin'), '%Y-%m-%d')
+        hora_fin = datetime.strptime(request.POST.get('hora_fin'), '%H:%M')
+        comuna_nombre = request.POST.get('comuna_seleccionada')  # Nombre de la comuna
 
-        # Crea objetos de zona horaria para asegurarte de que se manejen correctamente las fechas y horas
-        tz = pytz.timezone('America/Santiago')
+        # Encuentra la comuna por su nombre
+        comuna = Comuna.objects.get(comuna=comuna_nombre)
 
-        fecha_inicio = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d'))
-        hora_inicio = tz.localize(datetime.strptime(hora_inicio, '%H:%M'))
-        fecha_fin = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d'))
-        hora_fin = tz.localize(datetime.strptime(hora_fin, '%H:%M'))
+        estacionamientos_disponibles = Estacionamiento.objects.filter(comuna=comuna)
 
-        fecha_inicio_formulario = datetime.combine(fecha_inicio.date(), hora_inicio.time()).astimezone(tz)
+        # Calcula la diferencia de tiempo en horas
+        tiempo_estacionamiento = (fecha_fin - fecha_inicio).total_seconds() / 3600 + \
+                                 (hora_fin - hora_inicio).total_seconds() / 3600
 
-        print(fecha_inicio)
-        print(fecha_fin)
-        print(hora_inicio)
-        print(hora_fin)
-        print(fecha_inicio_formulario)
+        # Obtiene el costo por hora de la comuna seleccionada
+        costo_por_hora = comuna.estacionamiento_set.first().costo_por_hora  # Asume una relación entre Comuna y Estacionamiento
 
+        # Calcula el costo total
+        costo_total = tiempo_estacionamiento * costo_por_hora
 
-        # Obtén la fecha y hora actual con la misma zona horaria
-        ahora = datetime.now(tz)
-        print("Ahora es:", ahora)
-
-        # Inicializa la variable estacionamientos_disponibles
-        estacionamientos_disponibles = []
-
-        tiempo_transcurrido = fecha_fin - fecha_inicio + (hora_fin - hora_inicio)
-        # Calcula las horas totales
-        horas_totales = tiempo_transcurrido.total_seconds() / 3600
-
-        costo_por_hora = 0
-        
-
-        # Filtra estacionamientos disponibles
-        if ahora <= fecha_inicio_formulario:
-            estacionamientos_disponibles = Estacionamiento.objects.exclude(
-                id__in=Arrendamiento.objects.filter(
-                    Q(fecha_fin__gte=fecha_inicio, fecha_inicio__lte=fecha_fin) &
-                    Q(Q(hora_fin__gte=hora_inicio, hora_inicio__lte=hora_fin) |
-                    Q(hora_inicio__gte=hora_inicio, hora_inicio__lte=hora_fin))
-                ).values('estacionamiento__id')
-            ).filter(comuna__comuna=comuna)
-
-            for estacionamiento in estacionamientos_disponibles:
-                costo_por_hora=estacionamiento.costo_por_hora
-                print(horas_totales)
-                print(costo_por_hora)
-                estacionamiento.precio_total = costo_por_hora * horas_totales  # Calcula el precio total para este estacionamiento
-
-        # Pasa los valores calculados al contexto
         return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
             'estacionamientos_disponibles': estacionamientos_disponibles,
-            'horas_totales': horas_totales,
+            'horas_totales': tiempo_estacionamiento,
             'costo_por_hora': costo_por_hora,
+            'costo_total': costo_total,  # Pasa el costo total a la plantilla
+            'comunas': comunas,
         })
-    return render(request, 'estacionamiento/buscar.html')
 
-
-def confirmar_reserva(request, estacionamiento_id):
-    if request.user.is_authenticated:
-        # User is logged in
-        cliente = Cliente.objects.get(user=request.user)
-
-        # Recuperar los datos almacenados en la sesión
-        fecha_inicio = request.session.get('fecha_inicio')
-        hora_inicio = request.session.get('hora_inicio')
-        fecha_fin = request.session.get('fecha_fin')
-        hora_fin = request.session.get('hora_fin')
-        precio_total = request.session.get('precio_total')
-        estacionamiento_id = request.session.get('estacionamiento')
-
-        # Carga la instancia del Estacionamiento usando el ID
-        estacionamiento = Estacionamiento.objects.get(pk=estacionamiento_id)
-
-        tz = pytz.timezone('America/Santiago')
-
-        fecha_inicio = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d %H:%M:%S'))
-        hora_inicio = tz.localize(datetime.strptime(hora_inicio, '%Y-%m-%d %H:%M:%S'))
-        fecha_fin = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d %H:%M:%S'))
-        hora_fin = tz.localize(datetime.strptime(hora_fin, '%Y-%m-%d %H:%M:%S'))
+    return render(request, 'estacionamiento/buscar.html', {'comunas': comunas})
 
 
 
-
-
-        print("Datos recuperados de la sesión:")
-        print("Cliente:", cliente)
-        print("Fecha de inicio:", fecha_inicio)
-        print("Hora de inicio:", hora_inicio)
-        print("Fecha de fin:", fecha_fin)
-        print("Hora de fin:", hora_fin)
-        print("Precio total:", precio_total)
-        print("ID del estacionamiento:", estacionamiento_id)
-
-        # Crear un nuevo Arrendamiento y guardar los datos
-        arrendamiento = Arrendamiento(
-            cliente=cliente,
-            estacionamiento=estacionamiento,
-            fecha_inicio=fecha_inicio,
-            hora_inicio=hora_inicio,
-            fecha_fin=fecha_fin,
-            hora_fin=hora_fin,
-            precio=precio_total,
-        )
-        arrendamiento.save()
-
-        # Redirige a la página de pago exitoso
-        return redirect('pago_exitoso')
-
-    else:
-        # User is not logged in
-        return redirect('login')
     
 def pago_exitoso(request):
     # Lógica para la página de pago exitoso
@@ -203,3 +117,55 @@ def arriendos(request):
         arrendamientos = []
 
     return render(request, 'estacionamiento/arriendos.html', {'arrendamientos': arrendamientos})
+
+
+
+def editar_arrendamiento(request, arrendamiento_id):
+    arrendamiento = get_object_or_404(Arrendamiento, pk=arrendamiento_id)
+    
+    if request.method == 'POST':
+        fecha_inicio = request.POST.get('fecha')
+        hora_inicio = request.POST.get('hora_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        hora_fin = request.POST.get('hora_fin')
+
+        # Validación de datos (debes agregar validación según tus necesidades)
+
+        # Actualiza los datos del arrendamiento con los datos del formulario
+        arrendamiento.fecha = fecha_inicio
+        arrendamiento.hora_inicio = hora_inicio
+        arrendamiento.fecha_fin = fecha_fin
+        arrendamiento.hora_fin = hora_fin
+        arrendamiento.save()
+
+        return redirect('arriendos')
+    
+    return render(request, 'estacionamiento/editar_arrendamiento.html', {'arrendamiento': arrendamiento})
+
+
+
+
+def confirmar_cancelacion(request):
+    return render(request, 'estacionamiento/confirmacion_cancelado.html')
+
+
+
+def cancelar_reserva(request, arrendamiento_id):
+    try:
+        # Obtén el objeto de arrendamiento a cancelar
+        arrendamiento = Arrendamiento.objects.get(id=arrendamiento_id)
+        
+        # Realiza la lógica para cancelar la reserva aquí (por ejemplo, cambiar el estado de la reserva)
+        # ...
+
+        # Elimina el arrendamiento
+        arrendamiento.delete()
+
+        # Redirige a la página de confirmación de cancelación
+        return redirect('confirmar_cancelacion')
+    except Arrendamiento.DoesNotExist:
+        # Maneja el caso en el que el arrendamiento no existe
+        return redirect('error')
+    
+def error(request):
+    return render(request, 'error.html')

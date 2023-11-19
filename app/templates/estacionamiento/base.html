@@ -16,11 +16,11 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="">
-                <img src="{% static 'img/Logo.png' %}" alt="Logo" width="40" height="50"
-                    class="d-inline-block align-text-top">
-                <span style="color: white;">Cliente</span>
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <img src="{% static 'img/Logo.png' %}" alt="Logo" width="40" height="50" class="d-inline-block align-text-top">
+                <span style="color: white;">...</span>
             </a>
+            
 
 
 
@@ -34,41 +34,32 @@
 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Mi Perfil</a>
-                    </li>
 
-                    <!-- Mostrar "Mis Arriendos" solo a los dueños -->
-                    {% if user.is_authenticated and user.cliente %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'arriendos' %}">Mis Arriendos</a>
-                    </li>
-                {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Perfil
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                          <li><a class="dropdown-item" href="{% url 'arriendos' %}">Mis Arriendos</a></li>
+                          <li><a class="dropdown-item" href="#">Ayuda</a></li>
+                        </ul>
+                      </li>
 
-
-                    <!-- Mostrar "Mis Reservas" solo a los clientes -->
-                    {% if user.is_authenticated and user.dueno %}
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'arriendos' %}">Mis Estacionamientos</a>
-                    </li>
-                {% endif %}
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Ayuda</a>
-                    </li>
-                    {% if user.is_authenticated%}
-                    <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
                     {% else %}
-                    <li class="nav-item">                   
-                    <a class="nav-link"  href="{% url 'register' %}">Register</a></li>    
-                    <li class="nav-item">                
-                    <a class="nav-link"  href="{% url 'login' %}">Login</a></li>    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
                     {% endif %}
-
-
                 </ul>
+                
             </div>
         </div>
     </nav>
