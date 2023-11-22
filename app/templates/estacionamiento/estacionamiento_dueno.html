@@ -1,0 +1,38 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4">Estacionamientos</h1>
+
+    {% if estacionamientos %}
+        <ul class="list-group">
+            {% for estacionamiento in estacionamientos %}
+                <li class="list-group-item">
+                    <div>
+                        <h3>{{ estacionamiento.comuna.comuna }} - {{ estacionamiento.direccion }}</h3>
+                        <p>Precio por Hora: ${{ estacionamiento.costo_por_hora }}</p>
+
+                        {% if estacionamiento.habilitado %}
+                            <!-- Botón para deshabilitar si está habilitado -->
+                            <form method="post" action="{% url 'deshabilitar_estacionamiento' estacionamiento.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Deshabilitar</button>
+                            </form>
+                        {% else %}
+                            <!-- Botón para habilitar si está deshabilitado -->
+                            <form method="post" action="{% url 'habilitar_estacionamiento' estacionamiento.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Habilitar</button>
+                            </form>
+                        {% endif %}
+                        
+                        <!-- Agrega más información sobre el estacionamiento según tus necesidades -->
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay estacionamientos registrados para este dueño.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -9,6 +9,8 @@ from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente
 import pytz
 from datetime import datetime, timedelta
 from django.db.models import Q
+from django.utils import timezone
+
 
 def index(request):
     return render(request, 'accounts/index.html')
@@ -238,3 +240,43 @@ def confirmar_reserva(request, estacionamiento_id, fecha_inicio, hora_inicio, fe
     except Exception as e:
         print(f"Error al confirmar reserva: {e}")
         return redirect('estacionamiento:error')  # Ajusta 'error' según tus rutas
+    
+    
+
+def estacionamiento_dueno(request):
+    # Verifica si el usuario está autenticado
+    if request.user.is_authenticated:
+        # Obtiene el ID del usuario autenticado
+        dueno_id = request.user.id
+
+        # Filtra los estacionamientos asociados al dueño
+        estacionamientos = Estacionamiento.objects.filter(dueno_id=dueno_id)
+
+        # Renderiza la plantilla con la lista de estacionamientos
+        return render(request, 'estacionamiento/estacionamiento_dueno.html', {'estacionamientos': estacionamientos})
+    else:
+        # Maneja el caso en el que el usuario no esté autenticado
+        return render(request, 'estacionamiento/error.html', {'mensaje': 'Debes iniciar sesión para ver tus estacionamientos.'})
+    
+    
+def deshabilitar_estacionamiento(request, estacionamiento_id):
+    estacionamiento = Estacionamiento.objects.get(id=estacionamiento_id)
+
+    # Verifica si hay arrendamientos activos
+    if not Arrendamiento.objects.filter(estacionamiento=estacionamiento, fecha_fin__gte=timezone.now(), estado='activo').exists():
+        estacionamiento.habilitado = False
+        estacionamiento.save()
+        messages.success(request, f"Estacionamiento {estacionamiento.id} deshabilitado exitosamente.")
+    else:
+        messages.error(request, f"No se puede deshabilitar el estacionamiento {estacionamiento.id} porque está arrendado.")
+
+    return redirect('estacionamiento_dueno')
+
+def habilitar_estacionamiento(request, estacionamiento_id):
+    estacionamiento = Estacionamiento.objects.get(id=estacionamiento_id)
+
+    estacionamiento.habilitado = True
+    estacionamiento.save()
+    messages.success(request, f"Estacionamiento {estacionamiento.id} habilitado exitosamente.")
+
+    return redirect('estacionamiento_dueno')    

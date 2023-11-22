@@ -11,11 +11,13 @@ urlpatterns=[
      path('buscar/',views.buscar, name='buscar'),
      path('pago_exitoso/', views.pago_exitoso, name='pago_exitoso'),
      path('arriendos/', views.arriendos, name='arriendos'),
+     path('estacionamiento_dueno/', views.estacionamiento_dueno, name='estacionamiento_dueno'),
      path('editar_arrendamiento/<int:arrendamiento_id>/', views.editar_arrendamiento, name='editar_arrendamiento'),
      path('confirmar_cancelacion/', views.confirmar_cancelacion, name='confirmar_cancelacion'),
      path('cancelar_reserva/<int:arrendamiento_id>/', views.cancelar_reserva, name='cancelar_reserva'),
      path('confirmar_reserva/<int:estacionamiento_id>/<str:fecha_inicio>/<str:hora_inicio>/<str:fecha_fin>/<str:hora_fin>/<str:costo_total>/', views.confirmar_reserva, name='confirmar_reserva'),
-
+     path('deshabilitar_estacionamiento/<int:estacionamiento_id>/', views.deshabilitar_estacionamiento, name='deshabilitar_estacionamiento'),
+     path('habilitar_estacionamiento/<int:estacionamiento_id>/', views.habilitar_estacionamiento, name='habilitar_estacionamiento'),
      path('error/', views.error, name='error'),
      
 ]
