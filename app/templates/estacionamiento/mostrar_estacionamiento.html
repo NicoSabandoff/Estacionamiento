@@ -4,30 +4,30 @@
 <div class="container mt-5">
     <h1 class="display-4">Resultados de la Búsqueda</h1>
 
-    <ul class="list-group">
-        {% for estacionamiento in estacionamientos_disponibles %}
+        <ul class="list-group">
+            {% for estacionamiento in estacionamientos_disponibles %}
 
-        <li class="list-group-item col-md-6 d-flex justify-content-between align-items-center">
-            <div>
-                <span style="display: block;">Comuna: {{ estacionamiento.comuna.comuna }}</span>
-                <span style="display: block;">Dirección: {{ estacionamiento.direccion }}</span>
-                <div class="cuadro-costohora">
-                    Precio por Hora: ${{ estacionamiento.costo_por_hora }}
+            <li class="list-group-item col-md-6 d-flex justify-content-between align-items-center">
+                <div>
+                    <span style="display: block;">Comuna: {{ estacionamiento.comuna.comuna }}</span>
+                    <span style="display: block;">Dirección: {{ estacionamiento.direccion }}</span>
+                    <div class="cuadro-costohora">
+                        Precio por Hora: ${{ estacionamiento.costo_por_hora }}
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <a href="#" class="btn btn-reservar" data-toggle="modal"
+                <div>
+                    <a href="#" class="btn btn-reservar" data-toggle="modal"
                     data-target="#modal{{ estacionamiento.id }}"
-                    data-estacionamiento-id="{{ estacionamiento.id }}" onclick="reservarEstacionamiento(this)">Reservar</a>
+                    data-estacionamiento-id="{{ estacionamiento.id }}">Reservar</a>
+                </div>
+            </li>
+            {% empty %}
+            <div class="alert alert-info mt-3">
+                No se encontraron estacionamientos disponibles.
             </div>
-        </li>
-        {% empty %}
-        <div class="alert alert-info mt-3">
-            No se encontraron estacionamientos disponibles.
-        </div>
-        {% endfor %}
-    </ul>
+            {% endfor %}
+        </ul>
 
     <div class="row">
         <div class="col-md-6">
@@ -48,24 +48,24 @@
                             <p>Total de horas a reservar: {{ horas_totales }} horas</p>
                             <p>Valor a Pagar: ${{ costo_total }}</p>
 
-                            <!-- Formulario de confirmación de reserva -->
-                            <form method="post" action="{% url 'confirmar_reserva' estacionamiento_id=estacionamiento_id fecha_inicio=fecha_inicio hora_inicio=hora_inicio fecha_fin=fecha_fin hora_fin=hora_fin costo_total=costo_total %}">
 
-                                {% csrf_token %}
-                                <input type="hidden" name="estacionamiento_id" value="{{ estacionamiento.id }}">                      
 
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
-                            <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
-                        </form>
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
+                                <!-- Agrega un enlace o botón para confirmar la reserva -->
+                                <!-- Dentro del bucle para cada estacionamiento -->
+                                <a href="{% url 'confirmar_reserva' estacionamiento_id=estacionamiento.id fecha_inicio=fecha_inicio fecha_fin=fecha_fin hora_inicio=hora_inicio hora_fin=hora_fin %}" class="btn">Confirmar Reserva</a>
 
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endfor %}
+
+
+    {% endblock %}

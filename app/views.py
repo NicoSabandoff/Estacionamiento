@@ -10,6 +10,7 @@ import pytz
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
+from django.http import HttpResponse
 
 
 def index(request):
@@ -211,38 +212,49 @@ def error(request):
 
 
 
-def confirmar_reserva(request, estacionamiento_id, fecha_inicio, hora_inicio, fecha_fin, hora_fin, costo_total):
-    print("Entró a confirmar_reserva")
-
+def confirmar_reserva(request, estacionamiento_id, fecha_inicio, fecha_fin, hora_inicio, hora_fin):
     try:
-        # Formatea las fechas y horas
-        tz = pytz.timezone('America/Santiago')
-        fecha_inicio_obj = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d'))
-        hora_inicio_obj = tz.localize(datetime.strptime(hora_inicio, '%H:%M'))
-        fecha_fin_obj = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d'))
-        hora_fin_obj = tz.localize(datetime.strptime(hora_fin, '%H:%M'))
+        # Convertir las cadenas a objetos datetime sin información de la zona horaria
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d %H:%M:%S%z')
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d %H:%M:%S%z')
 
-        # Convierte la cadena de costo_total a un número decimal
-        costo_total = float(costo_total.replace(',', '.'))
+        # Establecer explícitamente la hora en las fechas
+        hora_inicio = datetime.strptime(hora_inicio, '%Y-%m-%d %H:%M:%S%z').time()
+        hora_fin = datetime.strptime(hora_fin, '%Y-%m-%d %H:%M:%S%z').time()
+        fecha_inicio = datetime.combine(fecha_inicio.date(), hora_inicio)
+        fecha_fin = datetime.combine(fecha_fin.date(), hora_fin)
 
-        # Imprime los valores para verificar
-        print("Estacionamiento ID:", estacionamiento_id)
-        print("Fecha inicio:", fecha_inicio_obj)
-        print("Hora inicio:", hora_inicio_obj)
-        print("Fecha fin:", fecha_fin_obj)
-        print("Hora fin:", hora_fin_obj)
-        print("Costo total:", costo_total)
+        # Obtener el usuario actual como cliente
+        cliente = request.user.cliente
 
-        # Resto del código para crear el objeto Arrendamiento y otras operaciones
+        # Crear una instancia del modelo Arrendamiento con los valores convertidos y el cliente
+        arrendamiento = Arrendamiento(
+            cliente=cliente,
+            estacionamiento_id=estacionamiento_id,
+            fecha_inicio=fecha_inicio.date(),
+            fecha_fin=fecha_fin.date(),
+            precio=0,
+            hora_inicio=fecha_inicio.time(),
+            hora_fin=fecha_fin.time(),
+            estado='activo'
+        )
 
-        return redirect('estacionamiento:pago_exitoso')  # Ajusta 'pago_exitoso' según tus rutas
+        # Guardar la instancia en la base de datos
+        arrendamiento.save()
+
+        # Resto del código...
+
+        # Devolver una respuesta exitosa
+        return redirect('pago_exitoso')
 
     except Exception as e:
-        print(f"Error al confirmar reserva: {e}")
-        return redirect('estacionamiento:error')  # Ajusta 'error' según tus rutas
-    
-    
+        # Imprimir o registrar cualquier excepción para entender el problema
+        print("Error en la conversión de fechas y horas:", str(e))
 
+        # Puedes agregar un mensaje de error a la respuesta para que puedas verlo en el navegador
+        return HttpResponse(f"Error en la confirmación de reserva: {str(e)}", status=500)
+    
+    
 def estacionamiento_dueno(request):
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
