@@ -150,22 +150,27 @@ def confirmar_cancelacion(request):
 
 
 
+from django.shortcuts import get_object_or_404, redirect
+
 def cancelar_reserva(request, arrendamiento_id):
     try:
         # Obtén el objeto de arrendamiento a cancelar
-        arrendamiento = Arrendamiento.objects.get(id=arrendamiento_id)
+        arrendamiento = get_object_or_404(Arrendamiento, id=arrendamiento_id)
         
-        # Realiza la lógica para cancelar la reserva aquí (por ejemplo, cambiar el estado de la reserva)
-        # ...
-
-        # Elimina el arrendamiento
-        arrendamiento.delete()
+        # Realiza la lógica para cancelar la reserva aquí
+        # Por ejemplo, cambia el estado a "eliminado"
+        arrendamiento.estado = 'eliminado'
+        
+        # Guarda los cambios en la base de datos
+        arrendamiento.save()
 
         # Redirige a la página de confirmación de cancelación
         return redirect('confirmar_cancelacion')
     except Arrendamiento.DoesNotExist:
         # Maneja el caso en el que el arrendamiento no existe
         return redirect('error')
+
+
     
 def error(request):
     return render(request, 'error.html')
