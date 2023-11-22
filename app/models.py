@@ -69,7 +69,7 @@ class Arrendamiento(models.Model):
 
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     estacionamiento = models.ForeignKey(Estacionamiento, on_delete=models.CASCADE)
-    fecha = models.DateField()
+    fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     precio = models.IntegerField()
     hora_inicio = models.TimeField()

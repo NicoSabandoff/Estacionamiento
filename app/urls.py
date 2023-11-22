@@ -14,8 +14,8 @@ urlpatterns=[
      path('editar_arrendamiento/<int:arrendamiento_id>/', views.editar_arrendamiento, name='editar_arrendamiento'),
      path('confirmar_cancelacion/', views.confirmar_cancelacion, name='confirmar_cancelacion'),
      path('cancelar_reserva/<int:arrendamiento_id>/', views.cancelar_reserva, name='cancelar_reserva'),
-     path('error/', views.error, name='error')
+     path('confirmar_reserva/<int:estacionamiento_id>/<str:fecha_inicio>/<str:hora_inicio>/<str:fecha_fin>/<str:hora_fin>/<str:costo_total>/', views.confirmar_reserva, name='confirmar_reserva'),
 
-     
+     path('error/', views.error, name='error'),
      
 ]

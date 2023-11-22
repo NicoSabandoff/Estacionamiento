@@ -62,45 +62,77 @@ def lista_comunas(request):
 
 
 
-
-
-
 def buscar(request):
     comunas = Comuna.objects.all()
 
+    # Inicializa costo_total fuera del bucle
+    costo_total = 0  
+
     if request.method == 'POST':
-        fecha_inicio = datetime.strptime(request.POST.get('fecha_inicio'), '%Y-%m-%d')
-        hora_inicio = datetime.strptime(request.POST.get('hora_inicio'), '%H:%M')
-        fecha_fin = datetime.strptime(request.POST.get('fecha_fin'), '%Y-%m-%d')
-        hora_fin = datetime.strptime(request.POST.get('hora_fin'), '%H:%M')
-        comuna_nombre = request.POST.get('comuna_seleccionada')  # Nombre de la comuna
+        fecha_inicio = request.POST.get('fecha_inicio')
+        hora_inicio = request.POST.get('hora_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        hora_fin = request.POST.get('hora_fin')
+        comuna_nombre = request.POST.get('comuna_seleccionada')
+        
+        
+        print("Fecha inicio:", fecha_inicio)
+        print("Hora inicio:", hora_inicio)
+        print("Fecha fin:", fecha_fin)
+        print("Hora fin:", hora_fin)
+        print("Costo total:", costo_total)
+        
 
         # Encuentra la comuna por su nombre
         comuna = Comuna.objects.get(comuna=comuna_nombre)
 
-        estacionamientos_disponibles = Estacionamiento.objects.filter(comuna=comuna)
+        # Crea objetos de zona horaria para asegurarte de que se manejen correctamente las fechas y horas
+        tz = pytz.timezone('America/Santiago')
 
-        # Calcula la diferencia de tiempo en horas
-        tiempo_estacionamiento = (fecha_fin - fecha_inicio).total_seconds() / 3600 + \
-                                 (hora_fin - hora_inicio).total_seconds() / 3600
+        fecha_inicio = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        hora_inicio = tz.localize(datetime.strptime(hora_inicio, '%H:%M'))
+        fecha_fin = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        hora_fin = tz.localize(datetime.strptime(hora_fin, '%H:%M'))
 
-        # Obtiene el costo por hora de la comuna seleccionada
-        costo_por_hora = comuna.estacionamiento_set.first().costo_por_hora  # Asume una relación entre Comuna y Estacionamiento
+        fecha_inicio_formulario = datetime.combine(fecha_inicio.date(), hora_inicio.time()).astimezone(tz)
 
-        # Calcula el costo total
-        costo_total = tiempo_estacionamiento * costo_por_hora
+        # Obtén la fecha y hora actual con la misma zona horaria
+        ahora = datetime.now(tz)
 
-        return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
-            'estacionamientos_disponibles': estacionamientos_disponibles,
-            'horas_totales': tiempo_estacionamiento,
-            'costo_por_hora': costo_por_hora,
-            'costo_total': costo_total,  # Pasa el costo total a la plantilla
-            'comunas': comunas,
-        })
+        # Filtra estacionamientos disponibles
+        if ahora <= fecha_inicio_formulario:
+            estacionamientos_disponibles = Estacionamiento.objects.exclude(
+                id__in=Arrendamiento.objects.filter(
+                    Q(fecha_fin__gte=fecha_inicio, fecha_inicio__lte=fecha_fin) &
+                    Q(hora_fin__gte=hora_inicio, hora_inicio__lte=hora_fin)
+                ).values('estacionamiento__id')
+            ).filter(comuna=comuna)
+
+            # Calcula las horas totales
+            tiempo_transcurrido = fecha_fin - fecha_inicio + (hora_fin - hora_inicio)
+            horas_totales = tiempo_transcurrido.total_seconds() / 3600
+
+            for estacionamiento in estacionamientos_disponibles:
+                costo_por_hora=estacionamiento.costo_por_hora
+                print(horas_totales)
+                print(costo_por_hora)
+                costo_total = costo_por_hora * horas_totales  # Calcula el precio total para este estacionamiento            
+                print(costo_total)
+
+            # Pasa los valores calculados al contexto
+            return render(request, 'estacionamiento/mostrar_estacionamiento.html', {
+                'estacionamientos_disponibles': estacionamientos_disponibles,
+                'horas_totales': horas_totales,
+                'costo_total': costo_total,
+                'fecha_inicio': fecha_inicio,
+                'hora_inicio': hora_inicio,
+                'fecha_fin': fecha_fin,
+                'hora_fin': hora_fin,                
+            })
+        else:
+            messages.error(request, "No hay estacionamientos disponibles en la comuna seleccionada.")
 
     return render(request, 'estacionamiento/buscar.html', {'comunas': comunas})
-
-
 
     
 def pago_exitoso(request):
@@ -174,3 +206,35 @@ def cancelar_reserva(request, arrendamiento_id):
     
 def error(request):
     return render(request, 'error.html')
+
+
+
+def confirmar_reserva(request, estacionamiento_id, fecha_inicio, hora_inicio, fecha_fin, hora_fin, costo_total):
+    print("Entró a confirmar_reserva")
+
+    try:
+        # Formatea las fechas y horas
+        tz = pytz.timezone('America/Santiago')
+        fecha_inicio_obj = tz.localize(datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+        hora_inicio_obj = tz.localize(datetime.strptime(hora_inicio, '%H:%M'))
+        fecha_fin_obj = tz.localize(datetime.strptime(fecha_fin, '%Y-%m-%d'))
+        hora_fin_obj = tz.localize(datetime.strptime(hora_fin, '%H:%M'))
+
+        # Convierte la cadena de costo_total a un número decimal
+        costo_total = float(costo_total.replace(',', '.'))
+
+        # Imprime los valores para verificar
+        print("Estacionamiento ID:", estacionamiento_id)
+        print("Fecha inicio:", fecha_inicio_obj)
+        print("Hora inicio:", hora_inicio_obj)
+        print("Fecha fin:", fecha_fin_obj)
+        print("Hora fin:", hora_fin_obj)
+        print("Costo total:", costo_total)
+
+        # Resto del código para crear el objeto Arrendamiento y otras operaciones
+
+        return redirect('estacionamiento:pago_exitoso')  # Ajusta 'pago_exitoso' según tus rutas
+
+    except Exception as e:
+        print(f"Error al confirmar reserva: {e}")
+        return redirect('estacionamiento:error')  # Ajusta 'error' según tus rutas
