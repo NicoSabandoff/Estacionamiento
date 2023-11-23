@@ -43,6 +43,7 @@
                                     <li><a class="dropdown-item" href="{% url 'arriendos' %}">Mis Arriendos</a></li>
                                 {% elif user.dueno %}
                                     <li><a class="dropdown-item" href="{% url 'estacionamiento_dueno' %}">Mis Estacionamientos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'reportes' %}">Reportes</a></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="#">Ayuda</a></li>
                             </ul>

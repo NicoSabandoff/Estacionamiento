@@ -22,5 +22,5 @@ urlpatterns=[
      path('calificar_dueno/<int:arrendamiento_id>/', views.calificar_dueno, name='calificar_dueno'),
      path('calificacion_duenos/', views.calificacion_duenos, name='calificacion_duenos'),
      path('reportes/',views.reportes, name='reportes'),
-     
+     path('generar_informe_pdf/', views.generar_informe_pdf, name='generar_informe_pdf'),
 ]

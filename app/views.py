@@ -11,9 +11,8 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
-from django.http import JsonResponse
-from django.urls import reverse
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 
 def index(request):
@@ -21,6 +20,9 @@ def index(request):
 
 def register(request):
     return render(request, 'accounts/register.html')
+
+def reportes(request):
+    return render(request, 'estacionamiento/reportes.html')
 
 class dueno_register(CreateView):
     model = User
@@ -353,35 +355,60 @@ def calificar_dueno(request, arrendamiento_id):
 
 
 
-@login_required
 def generar_informe_pdf(request):
-    # Obtiene los parámetros de fechas desde la solicitud GET
-    fecha_inicio_str = request.GET.get('fecha_inicio', '')
-    fecha_fin_str = request.GET.get('fecha_fin', '')
+    if request.method == 'GET':
+        fecha_inicio = request.GET.get('fecha_inicio')
+        fecha_fin = request.GET.get('fecha_fin')
 
-    # Convierte las cadenas de fecha a objetos de fecha
-    fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date() if fecha_inicio_str else None
-    fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date() if fecha_fin_str else None
+        # Convertir las fechas de cadena a objetos de fecha
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
 
-    # Filtra los arrendamientos en el rango de fechas especificado
-    arrendamientos = Arrendamiento.objects.filter(
-        fecha__gte=fecha_inicio,
-        fecha__lte=fecha_fin
-    )
+        # Filtrar los arrendamientos por fecha de inicio y fin
+        arrendamientos = Arrendamiento.objects.filter(
+            Q(fecha_inicio__gte=fecha_inicio) & Q(fecha_fin__lte=fecha_fin)
+        )
 
-    # Crear el objeto HttpResponse y el objeto PDF usando reportlab
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="informe.pdf"'
+        # Puedes hacer algo con los arrendamientos, como crear un informe PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="informe.pdf"'
 
-    p = canvas.Canvas(response)
-    p.drawString(100, 800, 'Informe de Estacionamientos Arrendados')
+        # Iniciar el objeto PDF
+        p = canvas.Canvas(response, pagesize=letter)
 
-    # Iterar sobre los arrendamientos y agregar información al informe
-    for arrendamiento in arrendamientos:
-        p.drawString(100, 780, f'Fecha de Inicio: {arrendamiento.fecha}')
-        # Agregar más detalles según tus necesidades
+        # Encabezado del informe
+        p.setFont("Helvetica-Bold", 14)  # Establecer el tamaño de la fuente
+        p.drawString(100, 765, f"Informe de arrendamientos desde:")
+        p.setFont("Helvetica-Bold", 12)  # Establecer el tamaño de la fuente
+        p.drawString(100, 750, f"{fecha_inicio} hasta {fecha_fin}")
+        
+        
+        p.setFont("Helvetica", 12)  # Establecer el tamaño de la fuente
+        # Contenido del informe con información de los arrendamientos
+        y_position = 725  # Ajusta la posición inicial del primer recuadro
 
-    p.showPage()
-    p.save()
+        for arrendamiento in arrendamientos:
 
-    return response
+            # Agregar información dentro del recuadro
+            p.drawString(110, y_position, f"Cliente: {arrendamiento.cliente.user.nombre} {arrendamiento.cliente.user.apellido}")
+            p.drawString(110, y_position - 15, f"RUT: {arrendamiento.cliente.user.rut}")
+            p.drawString(110, y_position - 30, f"Estacionamiento: {arrendamiento.estacionamiento.direccion}")
+            p.drawString(110, y_position - 45, f"Fecha de Inicio: {arrendamiento.fecha_inicio}")
+            p.drawString(110, y_position - 60, f"Fecha de Fin: {arrendamiento.fecha_fin}")
+            p.drawString(110, y_position - 75, f"Valor cancelado: {arrendamiento.precio}")
+            p.drawString(110, y_position - 90, f"Hora de Inicio: {arrendamiento.hora_inicio}")
+            p.drawString(110, y_position - 105, f"Hora de Fin: {arrendamiento.hora_fin}")
+
+            # Dibujar un recuadro alrededor de la información de cada arrendamiento
+            p.rect(100, y_position - 115, 400, 130)  # Ajusta las dimensiones según sea necesario
+
+            # Ajustar la posición para el próximo recuadro
+            y_position -= 150  # Ajusta el espacio entre recuadros según sea necesario
+
+        # Guardar la página y enviar la respuesta
+        p.showPage()
+        p.save()
+
+        return response
+
+    return render(request, 'estacionamiento/reportes.html')
