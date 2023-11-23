@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.generic import CreateView
 from .forms import DuenoSignUpForm, ClienteSignUpForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente
+from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente, Calificacion
 import pytz
 from datetime import datetime, timedelta
 from django.db.models import Q
@@ -323,38 +323,31 @@ def habilitar_estacionamiento(request, estacionamiento_id):
 
 
 
+
 def calificar_dueno(request, arrendamiento_id):
     arrendamiento = get_object_or_404(Arrendamiento, id=arrendamiento_id)
-    print("entro a la funcion calificar")
 
     if request.method == 'POST':
-        print("entro al if")
         try:
             calificacion = request.POST.get('calificacion')
             comentario = request.POST.get('comentario')
-            print(calificacion)
-            print(comentario)
 
-            # Obtén el usuario actual y el arrendamiento
             usuario = request.user
             estacionamiento = arrendamiento.estacionamiento
             dueno = estacionamiento.dueno
-            print(dueno)
 
-            calificacion_obj = Calificacion.objects.create(usuario=usuario, dueno=dueno,
-                                                           calificacion=calificacion, comentario=comentario)
-            
-            # Asocia la calificación al arrendamiento
-            arrendamiento.calificacion = calificacion_obj
-            arrendamiento.save()
+            calificacion = Calificacion(usuario=usuario,
+                                        dueno=dueno,
+                                        calificacion=calificacion,
+                                        comentario=comentario)
+            calificacion.save()
 
-            messages.success(request, 'Calificación enviada exitosamente.')
-
-            # Devuelve una respuesta JSON indicando éxito
-            return JsonResponse({'success': True})
+            # Devuelve una respuesta JSON indicando éxito sin redirección
+            return JsonResponse({'success': True, 'message': 'Calificación enviada exitosamente.'})
 
         except Exception as e:
-            messages.error(request, f'Error al procesar la calificación: {e}')
+            # Maneja el error y devuelve una respuesta JSON con el mensaje de error
+            return JsonResponse({'success': False, 'error_message': str(e)})
 
-    # Manejar casos donde la solicitud no es POST (podrías devolver un mensaje de error)
-    return render(request, 'estacionamiento/arriendos.html', {'arrendamiento': arrendamiento})
+    # Si la solicitud no es POST, devuelve un error BadRequest
+    return JsonResponse({'success': False, 'error_message': 'Bad Request: Se esperaba una solicitud POST.'}, status=400)

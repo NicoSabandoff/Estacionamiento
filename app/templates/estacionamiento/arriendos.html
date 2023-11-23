@@ -69,6 +69,18 @@
                                 <div class="form-group mt-5">
                                     <button type="submit" class="btn btn-primary">Calificar</button>
                                 </div>
+
+                                {% if success_message %}
+                                    <div class="alert alert-success" role="alert">
+                                        {{ success_message }}
+                                    </div>
+                                {% endif %}
+
+                                {% if error_message %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{ error_message }}
+                                    </div>
+                                {% endif %}
                             </div>
                                                     
 
@@ -105,6 +117,34 @@
                 });
             });
         });
+
+        const calificarForm = document.querySelector('#tuFormularioDeCalificacion');
+
+        calificarForm.addEventListener('submit', async (event) => {
+            event.preventDefault();  // Evita la presentación del formulario
+            
+            const formData = new FormData(calificarForm);
+            
+            try {
+                const response = await fetch('/ruta/de/tu/vista/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);  // Muestra el mensaje de éxito como una alerta
+                    // Puedes agregar más lógica para actualizar la interfaz según sea necesario
+                } else {
+                    alert('Error al procesar la calificación: ' + data.error_message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+            }
+        });
+
+
     </script>
     
     
