@@ -324,24 +324,37 @@ def habilitar_estacionamiento(request, estacionamiento_id):
 
 
 def calificar_dueno(request, arrendamiento_id):
+    arrendamiento = get_object_or_404(Arrendamiento, id=arrendamiento_id)
+    print("entro a la funcion calificar")
+
     if request.method == 'POST':
-        calificacion = request.POST.get('calificacion')
-        comentario = request.POST.get('comentario')
+        print("entro al if")
+        try:
+            calificacion = request.POST.get('calificacion')
+            comentario = request.POST.get('comentario')
+            print(calificacion)
+            print(comentario)
 
-        # Obtén el usuario actual y el arrendamiento
-        usuario = request.user
-        arrendamiento = Arrendamiento.objects.get(id=arrendamiento_id)
-        estacionamiento = arrendamiento.estacionamiento
-        dueno = estacionamiento.dueno
+            # Obtén el usuario actual y el arrendamiento
+            usuario = request.user
+            estacionamiento = arrendamiento.estacionamiento
+            dueno = estacionamiento.dueno
+            print(dueno)
 
-        # Crea la calificación
-        Calificacion.objects.create(usuario=usuario, dueno=dueno,
-                                    calificacion=calificacion, comentario=comentario)
+            calificacion_obj = Calificacion.objects.create(usuario=usuario, dueno=dueno,
+                                                           calificacion=calificacion, comentario=comentario)
+            
+            # Asocia la calificación al arrendamiento
+            arrendamiento.calificacion = calificacion_obj
+            arrendamiento.save()
 
-        messages.success(request, 'Calificación enviada exitosamente.')
+            messages.success(request, 'Calificación enviada exitosamente.')
 
-        # Devuelve una respuesta JSON indicando éxito
-        return JsonResponse({'success': True})
+            # Devuelve una respuesta JSON indicando éxito
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            messages.error(request, f'Error al procesar la calificación: {e}')
 
     # Manejar casos donde la solicitud no es POST (podrías devolver un mensaje de error)
-    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+    return render(request, 'estacionamiento/arriendos.html', {'arrendamiento': arrendamiento})

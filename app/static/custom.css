@@ -81,11 +81,6 @@
     border: none; /* Elimina el borde si es necesario */
 }
 
-  
-.rating i {
-  display: none;
-}
-
-.rating.show-stars i {
-  display: inline;
+.rating i.rated {
+  color: rgb(230, 136, 12);  /* o el color que desees para las estrellas seleccionadas */
 }

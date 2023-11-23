@@ -49,22 +49,31 @@
                         <!-- Contenido del formulario de calificación -->
                         <form method="post" action="{% url 'calificar_dueno' arrendamiento.id %}">
                             {% csrf_token %}
-                            <!-- Campo oculto para la calificación -->
-                            <input type="hidden" name="calificacion" id="calificacion" value="0">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="calificacion">Calificación:</label>
+                                    <div class="rating" id="rating">
+                                        {% for i in "12345" %}
+                                            <i class="far fa-star" data-index="{{ i }}"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <!-- Campo oculto para la calificación -->
+                                    <input type="hidden" name="calificacion" id="calificacion" value="0">
+                                </div>
+                        
+                                <div class="form-group">
+                                    <label for="comentario">Comentario:</label>
+                                    <textarea class="form-control" name="comentario" id="comentario" rows="3"></textarea>
+                                </div>
 
-                            <label for="calificacion">Calificación:</label>
-                            <div class="rating" id="rating">
-                                {% for i in "12345" %}
-                                    <i class="far fa-star" data-index="{{ i }}"></i>
-                                {% endfor %}
+                                <div class="form-group mt-5">
+                                    <button type="submit" class="btn btn-primary">Calificar</button>
+                                </div>
                             </div>
+                                                    
 
-                            <label for="comentario">Comentario:</label>
-                            <textarea name="comentario" id="comentario" rows="3"></textarea>
-
-                            <button type="submit" class="btn btn-primary">Calificar</button>
                         </form>
-                    </div>
+                        
                 </div>
             </div>
         </div>
@@ -73,6 +82,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Script cargado correctamente');
             // Manejar el clic en las estrellas
             const ratingStars = document.querySelectorAll('.rating i');
             const calificacionInput = document.getElementById('calificacion');
@@ -82,17 +92,21 @@
                     const ratingValue = star.getAttribute('data-index');
                     calificacionInput.value = ratingValue;
                     ratingStars.forEach((s, index) => {
-                        s.classList.toggle('rated', index < ratingValue);
+                        s.style.backgroundColor = index < ratingValue ? 'yellow' : '';
                     });
                 });
             });
     
-            // Restablecer las estrellas al abrir el modal
-            const calificarButton = document.querySelector('[data-target="#calificarModal"]');
-            calificarButton.addEventListener('click', () => {
-                ratingStars.forEach(s => s.classList.remove('rated'));
+            // Restablecer las estrellas al abrir el modal específico
+            const calificarButtons = document.querySelectorAll('[data-target^="#calificarModal"]');
+            calificarButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    ratingStars.forEach(s => s.style.backgroundColor = '');
+                });
             });
         });
     </script>
+    
+    
     
 {% endblock %}

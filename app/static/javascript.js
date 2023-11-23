@@ -138,12 +138,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 
-
-
-
-
-
-
 document.getElementById("rut").addEventListener("blur", function() {
     var rutInput = this.value;
     
