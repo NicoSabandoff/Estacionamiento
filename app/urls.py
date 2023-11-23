@@ -20,5 +20,6 @@ urlpatterns=[
      path('habilitar_estacionamiento/<int:estacionamiento_id>/', views.habilitar_estacionamiento, name='habilitar_estacionamiento'),
      path('error/', views.error, name='error'),
      path('calificar_dueno/<int:arrendamiento_id>/', views.calificar_dueno, name='calificar_dueno'),
+      path('calificacion_duenos/', views.calificacion_duenos, name='calificacion_duenos'),
      
 ]

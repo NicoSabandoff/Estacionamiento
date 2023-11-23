@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.urls import reverse
 
 
 
@@ -144,7 +145,9 @@ def pago_exitoso(request):
     # Lógica para la página de pago exitoso
     return render(request, 'estacionamiento/pago_exitoso.html')    
 
-
+def calificacion_duenos(request):
+    # Lógica para la página de pago exitoso
+    return render(request, 'estacionamiento/calificacion_duenos.html')    
 
 def arriendos(request):
     if request.user.is_authenticated:
@@ -199,9 +202,6 @@ def editar_arrendamiento(request, arrendamiento_id):
 def confirmar_cancelacion(request):
     return render(request, 'estacionamiento/confirmacion_cancelado.html')
 
-
-
-from django.shortcuts import get_object_or_404, redirect
 
 def cancelar_reserva(request, arrendamiento_id):
     try:
@@ -323,7 +323,6 @@ def habilitar_estacionamiento(request, estacionamiento_id):
 
 
 
-
 def calificar_dueno(request, arrendamiento_id):
     arrendamiento = get_object_or_404(Arrendamiento, id=arrendamiento_id)
 
@@ -342,12 +341,12 @@ def calificar_dueno(request, arrendamiento_id):
                                         comentario=comentario)
             calificacion.save()
 
-            # Devuelve una respuesta JSON indicando éxito sin redirección
-            return JsonResponse({'success': True, 'message': 'Calificación enviada exitosamente.'})
+            # Redirige a la página 'calificacion_duenos'
+            return redirect('calificacion_duenos')
 
         except Exception as e:
             # Maneja el error y devuelve una respuesta JSON con el mensaje de error
-            return JsonResponse({'success': False, 'error_message': str(e)})
+            return render(request, 'error.html', {'error_message': str(e)}, status=400)
 
     # Si la solicitud no es POST, devuelve un error BadRequest
-    return JsonResponse({'success': False, 'error_message': 'Bad Request: Se esperaba una solicitud POST.'}, status=400)
+    return render(request, 'error.html', {'error_message': 'Bad Request: Se esperaba una solicitud POST.'}, status=400)
