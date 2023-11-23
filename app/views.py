@@ -11,6 +11,8 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from django.utils import timezone
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 
 
 def index(request):
@@ -148,12 +150,26 @@ def arriendos(request):
     if request.user.is_authenticated:
         cliente = Cliente.objects.get(user=request.user)
         arrendamientos = Arrendamiento.objects.filter(cliente=cliente)
+
+        # Obtener la zona horaria actual
+        current_timezone = timezone.get_current_timezone()
+
+        # Actualizar estados de arrendamientos si la fecha fin y hora fin son anteriores a la actual
+        now = timezone.now()
+        for arrendamiento in arrendamientos:
+            fecha_fin_hora_fin = datetime.combine(
+                arrendamiento.fecha_fin,
+                arrendamiento.hora_fin
+            ).replace(tzinfo=current_timezone)
+
+            if fecha_fin_hora_fin < now:
+                arrendamiento.estado = 'finalizado'
+                arrendamiento.save()
+
     else:
         arrendamientos = []
 
     return render(request, 'estacionamiento/arriendos.html', {'arrendamientos': arrendamientos})
-
-
 
 def editar_arrendamiento(request, arrendamiento_id):
     arrendamiento = get_object_or_404(Arrendamiento, pk=arrendamiento_id)
@@ -233,11 +249,23 @@ def confirmar_reserva(request, estacionamiento_id, fecha_inicio, fecha_fin, hora
             estacionamiento_id=estacionamiento_id,
             fecha_inicio=fecha_inicio.date(),
             fecha_fin=fecha_fin.date(),
-            precio=0,
             hora_inicio=fecha_inicio.time(),
             hora_fin=fecha_fin.time(),
             estado='activo'
         )
+
+        # Calcular las horas totales de la reserva
+        tiempo_transcurrido = fecha_fin - fecha_inicio
+        horas_totales = tiempo_transcurrido.total_seconds() / 3600
+
+        # Obtener el estacionamiento
+        estacionamiento = Estacionamiento.objects.get(id=estacionamiento_id)
+
+        # Calcular el precio total
+        precio_total = estacionamiento.costo_por_hora * horas_totales
+
+        # Asignar el precio total al arrendamiento
+        arrendamiento.precio = precio_total
 
         # Guardar la instancia en la base de datos
         arrendamiento.save()
@@ -292,3 +320,28 @@ def habilitar_estacionamiento(request, estacionamiento_id):
     messages.success(request, f"Estacionamiento {estacionamiento.id} habilitado exitosamente.")
 
     return redirect('estacionamiento_dueno')    
+
+
+
+def calificar_dueno(request, arrendamiento_id):
+    if request.method == 'POST':
+        calificacion = request.POST.get('calificacion')
+        comentario = request.POST.get('comentario')
+
+        # Obtén el usuario actual y el arrendamiento
+        usuario = request.user
+        arrendamiento = Arrendamiento.objects.get(id=arrendamiento_id)
+        estacionamiento = arrendamiento.estacionamiento
+        dueno = estacionamiento.dueno
+
+        # Crea la calificación
+        Calificacion.objects.create(usuario=usuario, dueno=dueno,
+                                    calificacion=calificacion, comentario=comentario)
+
+        messages.success(request, 'Calificación enviada exitosamente.')
+
+        # Devuelve una respuesta JSON indicando éxito
+        return JsonResponse({'success': True})
+
+    # Manejar casos donde la solicitud no es POST (podrías devolver un mensaje de error)
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

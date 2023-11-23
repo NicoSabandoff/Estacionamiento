@@ -203,3 +203,6 @@ document.getElementById("telefono").addEventListener("input", function () {
         telefonoError.textContent = "";
     }
 });
+
+
+

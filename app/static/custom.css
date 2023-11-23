@@ -82,4 +82,10 @@
 }
 
   
-  
+.rating i {
+  display: none;
+}
+
+.rating.show-stars i {
+  display: inline;
+}

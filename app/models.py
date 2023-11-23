@@ -87,3 +87,11 @@ class Reporte(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
 
+class Calificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    dueno = models.ForeignKey(Dueno, on_delete=models.CASCADE)
+    calificacion = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])
+    comentario = models.TextField()
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.dueno.user.username}"
