@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.urls import reverse
-
+from reportlab.pdfgen import canvas
 
 
 def index(request):
@@ -350,3 +350,38 @@ def calificar_dueno(request, arrendamiento_id):
 
     # Si la solicitud no es POST, devuelve un error BadRequest
     return render(request, 'error.html', {'error_message': 'Bad Request: Se esperaba una solicitud POST.'}, status=400)
+
+
+
+@login_required
+def generar_informe_pdf(request):
+    # Obtiene los parámetros de fechas desde la solicitud GET
+    fecha_inicio_str = request.GET.get('fecha_inicio', '')
+    fecha_fin_str = request.GET.get('fecha_fin', '')
+
+    # Convierte las cadenas de fecha a objetos de fecha
+    fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date() if fecha_inicio_str else None
+    fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date() if fecha_fin_str else None
+
+    # Filtra los arrendamientos en el rango de fechas especificado
+    arrendamientos = Arrendamiento.objects.filter(
+        fecha__gte=fecha_inicio,
+        fecha__lte=fecha_fin
+    )
+
+    # Crear el objeto HttpResponse y el objeto PDF usando reportlab
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="informe.pdf"'
+
+    p = canvas.Canvas(response)
+    p.drawString(100, 800, 'Informe de Estacionamientos Arrendados')
+
+    # Iterar sobre los arrendamientos y agregar información al informe
+    for arrendamiento in arrendamientos:
+        p.drawString(100, 780, f'Fecha de Inicio: {arrendamiento.fecha}')
+        # Agregar más detalles según tus necesidades
+
+    p.showPage()
+    p.save()
+
+    return response
