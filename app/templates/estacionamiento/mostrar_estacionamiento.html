@@ -55,7 +55,9 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn" data-dismiss="modal">Cerrar</button>
                                 <!-- Agrega un enlace o botón para confirmar la reserva -->
-                                <a href="{% url 'pago_exitoso'%}" class="btn">Confirmar Reserva</a>
+                                <!-- Dentro del bucle para cada estacionamiento -->
+                                <a href="{% url 'confirmar_reserva' estacionamiento_id=estacionamiento.id fecha_inicio=fecha_inicio fecha_fin=fecha_fin hora_inicio=hora_inicio hora_fin=hora_fin %}" class="btn">Confirmar Reserva</a>
+
                             </div>
                         </div>
                     </div>

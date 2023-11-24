@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/53580091aa.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'custom.css' %}">
 </head>
@@ -18,22 +19,21 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">
                 <img src="{% static 'img/Logo.png' %}" alt="Logo" width="40" height="50" class="d-inline-block align-text-top">
-                <span style="color: white;">...</span>
+                {% if user.is_authenticated %}
+                    <span style="color: white;">Hola {{ user.nombre}} {{ user.apellido }}</span>
+                {% endif %}
             </a>
-            
-
-
-
+    
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
                 style="background-color: transparent; border: 1px solid white;">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-
-
+    
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
+
+
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -46,26 +46,43 @@
                         </ul>
                       </li>
 
+
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Perfil
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
+                                {% if user.cliente %}
+                                    <li><a class="dropdown-item" href="{% url 'arriendos' %}">Mis Arriendos</a></li>
+                                {% elif user.dueno %}
+                                    <li><a class="dropdown-item" href="{% url 'estacionamiento_dueno' %}">Mis Estacionamientos</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'reportes' %}">Reportes</a></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="#">Ayuda</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
                     {% endif %}
                 </ul>
-                
             </div>
         </div>
     </nav>
 
     <div class="container">
-        {% block content %}{% endblock %}
+        {% block content %}
+        
+        {% endblock %}
     </div>
 
     <footer style="position: absolute; bottom: 0; width: 100%;">

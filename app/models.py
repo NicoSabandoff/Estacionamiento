@@ -63,13 +63,23 @@ class Estacionamiento(models.Model):
 
 
 class Arrendamiento(models.Model):
+    ESTADO_CHOICES = [
+        ('activo', 'Activo'),
+        ('finalizado', 'Finalizado'),
+        ('eliminado', 'Eliminado'),
+    ]
+
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     estacionamiento = models.ForeignKey(Estacionamiento, on_delete=models.CASCADE)
-    fecha = models.DateField()
+    fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     precio = models.IntegerField()
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='activo')
+
+    def __str__(self):
+        return f"{self.cliente} - {self.estacionamiento} - {self.fecha} - Estado: {self.estado}"
 
 class Reporte(models.Model):
     estacionamiento = models.ForeignKey(Estacionamiento, on_delete=models.CASCADE)
@@ -79,3 +89,11 @@ class Reporte(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
 
+class Calificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    dueno = models.ForeignKey(Dueno, on_delete=models.CASCADE)
+    calificacion = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)])
+    comentario = models.TextField()
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.dueno.user.username}"

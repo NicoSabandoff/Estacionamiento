@@ -1,0 +1,28 @@
+{% extends 'estacionamiento/base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Generar Informe PDF</h2>
+
+    <form method="get" action="{% url 'generar_informe_pdf' %}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio:</label>
+                    <input type="date" class="form-control" name="fecha_inicio" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha de Fin:</label>
+                    <input type="date" class="form-control" name="fecha_fin" required>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Generar Informe PDF</button>
+    </form>
+</div>
+
+{% endblock %}
