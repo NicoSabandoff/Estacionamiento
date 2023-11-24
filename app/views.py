@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.views.generic import CreateView
-from .forms import DuenoSignUpForm, ClienteSignUpForm
+from .forms import DuenoSignUpForm, ClienteSignUpForm, RegistroVehiculoForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Arrendamiento, Comuna, Estacionamiento, User, Cliente, Calificacion
 import pytz
@@ -230,6 +230,7 @@ def error(request):
 
 
 
+
 def confirmar_reserva(request, estacionamiento_id, fecha_inicio, fecha_fin, hora_inicio, hora_fin):
     try:
         # Convertir las cadenas a objetos datetime sin información de la zona horaria
@@ -412,3 +413,27 @@ def generar_informe_pdf(request):
         return response
 
     return render(request, 'estacionamiento/reportes.html')
+
+def perfil(request):
+        cliente = Cliente.objects.get(user=request.user)
+        return render(request, 'accounts/perfil.html', {'cliente': cliente})
+
+def registro_vehiculo(request):
+    return render(request, 'accounts/registro_vehiculo.html')
+
+def registro_vehiculo(request):
+    if request.method == 'POST':
+        form = RegistroVehiculoForm(request.POST)
+        if form.is_valid():
+            vehiculo = form.save(commit=False)
+            vehiculo.cliente = request.user.cliente
+            vehiculo.save()
+            messages.success(request, 'Vehículo registrado con éxito.')
+            return redirect('perfil')
+        else:
+            messages.error(request, 'Error en el formulario. Por favor, verifica los datos.')
+    else:
+        form = RegistroVehiculoForm()
+
+    return render(request, 'accounts/registro_vehiculo.html', {'form': form})
+

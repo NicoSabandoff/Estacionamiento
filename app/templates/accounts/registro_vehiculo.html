@@ -1,0 +1,10 @@
+<!-- En registro_vehiculo.html -->
+{% extends 'estacionamiento/base.html' %}
+{% block content %}
+  <h1>Registro de Vehículo</h1>
+  <form method="post" action="{% url 'registro_vehiculo' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class='btn'type="submit">Registrar Vehículo</button>
+  </form>
+{% endblock %}

@@ -32,6 +32,21 @@
     
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
+
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Perfil
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <li><a class="dropdown-item" href="{%url 'perfil' %}">Mi Perfil</a></li>
+                          <li><a class="dropdown-item" href="{% url 'arriendos' %}">Mis Arriendos</a></li>
+                          <li><a class="dropdown-item" href="#">Ayuda</a></li>
+                        </ul>
+                      </li>
+
+
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
