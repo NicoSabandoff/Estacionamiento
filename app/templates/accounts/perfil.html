@@ -1,0 +1,12 @@
+{% extends 'estacionamiento/base.html' %}
+{% block content %}
+  <h1>Perfil de {{ cliente.user.username }}</h1>
+
+  <h2>Vehículos Registrados</h2>
+  <ul>
+    {% for vehiculo in cliente.obtener_vehiculos %}
+      <li>{{ vehiculo.marca }} {{ vehiculo.modelo }} - {{ vehiculo.patente }}</li>
+    {% endfor %}
+  </ul>  
+  <a class='btn' href="{% url 'registro_vehiculo' %}">Registrar nuevo vehículo</a>
+{% endblock %}

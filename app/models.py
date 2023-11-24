@@ -12,6 +12,8 @@ class User(AbstractUser):
 
 class Cliente(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, primary_key = True)
+    def obtener_vehiculos(self):
+        return Vehiculo.objects.filter(cliente=self)
 
 class Dueno(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, primary_key = True)
@@ -22,7 +24,7 @@ class Comuna(models.Model):
 
 
 class Vehiculo(models.Model):
-    patente = models.CharField(max_length=7)
+    patente = models.CharField(max_length=8)
     modelo = models.CharField(max_length=50)
     marca = models.CharField(max_length=50)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
