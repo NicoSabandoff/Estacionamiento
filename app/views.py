@@ -188,12 +188,11 @@ def editar_arrendamiento(request, arrendamiento_id):
         # Validación de datos (debes agregar validación según tus necesidades)
 
         # Actualiza los datos del arrendamiento con los datos del formulario
-        arrendamiento.fecha = fecha_inicio
+        arrendamiento.fecha_inicio = fecha_inicio
         arrendamiento.hora_inicio = hora_inicio
         arrendamiento.fecha_fin = fecha_fin
         arrendamiento.hora_fin = hora_fin
         arrendamiento.save()
-
         return redirect('arriendos')
     
     return render(request, 'estacionamiento/editar_arrendamiento.html', {'arrendamiento': arrendamiento})
